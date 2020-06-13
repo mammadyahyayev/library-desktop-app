@@ -44,7 +44,7 @@ public class DaoImpl implements DaoInterface {
                 ps = c.prepareStatement(sql);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    Author author = Author.getInstance();
+                    Author author = new Author();
                     author.setRowNum(rs.getLong("r"));
                     author.setId(rs.getLong("ID"));
                     author.setName(rs.getString("NAME"));
@@ -107,7 +107,7 @@ public class DaoImpl implements DaoInterface {
 
     @Override
     public byte[] getAuthorPhotoById(Long authorId) throws Exception {
-        Author author = Author.getInstance();
+        Author author = new Author();
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -1051,7 +1051,7 @@ public class DaoImpl implements DaoInterface {
 
     @Override
     public Author getAuthorById(Long authorId) throws Exception {
-        Author author = Author.getInstance();
+        Author author = new Author();
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -2651,7 +2651,7 @@ public class DaoImpl implements DaoInterface {
                 ps.setString(4, "%" + keyword + "%");
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    Author author = Author.getInstance();
+                    Author author = new Author();
                     author.setRowNum(rs.getLong("r"));
                     author.setId(rs.getLong("ID"));
                     author.setName(rs.getString("NAME"));

@@ -208,7 +208,7 @@ public class AddAuthor extends javax.swing.JFrame {
     }//GEN-LAST:event_addImageActionPerformed
 
     private void saveBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveBtnMouseClicked
-        Author author = Author.getInstance();
+        Author author = new Author();
         if (nameTxt.getText().isEmpty() || surnameTxt.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Bütün Xanaları Doldurun!!!");
         } else {
