@@ -3,13 +3,11 @@ package dao;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import model.AdvancedSearch;
-
 import model.Author;
 import model.Book;
 import model.BookStatus;
@@ -21,7 +19,6 @@ import model.OnlyOrder;
 import model.OrderBook;
 import model.Paid;
 import model.Product;
-import model.ReceiveEmail;
 import model.SendEmail;
 import model.Shelf;
 import model.Student;
@@ -32,6 +29,8 @@ import util.Utility;
 
 public class DaoImpl implements DaoInterface {
 
+    // TODO: Write Query with PL-SQL 
+    // TODO: Design Patterns
     @Override
     public List<Author> getAuthorList() throws Exception {
         List<Author> authorList = new ArrayList<>();
@@ -45,7 +44,7 @@ public class DaoImpl implements DaoInterface {
                 ps = c.prepareStatement(sql);
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    Author author = new Author();
+                    Author author = Author.getInstance();
                     author.setRowNum(rs.getLong("r"));
                     author.setId(rs.getLong("ID"));
                     author.setName(rs.getString("NAME"));
@@ -108,7 +107,7 @@ public class DaoImpl implements DaoInterface {
 
     @Override
     public byte[] getAuthorPhotoById(Long authorId) throws Exception {
-        Author author = new Author();
+        Author author = Author.getInstance();
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -1052,7 +1051,7 @@ public class DaoImpl implements DaoInterface {
 
     @Override
     public Author getAuthorById(Long authorId) throws Exception {
-        Author author = new Author();
+        Author author = Author.getInstance();
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -2652,7 +2651,7 @@ public class DaoImpl implements DaoInterface {
                 ps.setString(4, "%" + keyword + "%");
                 rs = ps.executeQuery();
                 while (rs.next()) {
-                    Author author = new Author();
+                    Author author = Author.getInstance();
                     author.setRowNum(rs.getLong("r"));
                     author.setId(rs.getLong("ID"));
                     author.setName(rs.getString("NAME"));

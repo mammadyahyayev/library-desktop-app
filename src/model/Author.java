@@ -5,14 +5,23 @@ import java.util.Date;
 
 public class Author extends AbstractModel {
 
+   private static Author INSTANCE  = new Author();
+    
     private String name;
     private String surname;
     private Date birthDate;
     private Date deathDate;
     private String advanceInfo;
     private Blob img;
-    
 
+    private Author() {
+    
+    }
+
+    public static Author getInstance() {
+        return INSTANCE;
+    }
+    
     public String getName() {
         return name;
     }

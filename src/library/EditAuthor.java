@@ -241,7 +241,7 @@ public class EditAuthor extends javax.swing.JFrame {
     }//GEN-LAST:event_clearBtnMouseClicked
 
     private void editBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_editBtnMouseClicked
-        Author author = new Author();
+        Author author = Author.getInstance();
         if (nameTxt.getText().isEmpty() || surnameTxt.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Bütün Xanaları Doldurun!!!");
         } else {
