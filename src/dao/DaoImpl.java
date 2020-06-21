@@ -27,12 +27,16 @@ import model.Table;
 import model.TableOrder;
 import model.TableStatus;
 import oracle.jdbc.OracleTypes;
+import oracle.jdbc.oracore.OracleType;
 import util.Utility;
 
 public class DaoImpl implements DaoInterface {
 
     // TODO: Write Query with PL-SQL 
     // TODO: Design Patterns
+    // TODO : look at theese lines 1610-1725 and write query method with pl-sql 
+    // TODO : you was working at 2000 lines 
+    
     @Override
     public List<Author> getAuthorList() throws Exception {
         List<Author> authorList = new ArrayList<>();
@@ -78,7 +82,7 @@ public class DaoImpl implements DaoInterface {
         Connection c = null;
         CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "{? = call GET_STUDENT_LIST()}";
+        String sql = "{? = call GET_STUDENT_LIST}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
@@ -834,8 +838,8 @@ public class DaoImpl implements DaoInterface {
         Connection c = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO STUDENT(ID,NAME,SURNAME,STUDENT_GROUP,PHONE,EMAIL,IMG) \n"
-                + " VALUES(STUDENT_SEQ.NEXTVAL,?,?,?,?,?,?)";
+        String sql = " INSERT INTO STUDENT(ID,NAME,SURNAME,STUDENT_GROUP,PHONE,EMAIL,IMG) "
+                + "  VALUES(STUDENT_SEQ.NEXTVAL,?,?,?,?,?,?)";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
@@ -862,7 +866,6 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-
             util.Utility.close(c, ps, rs);
         }
         return result;
@@ -872,27 +875,27 @@ public class DaoImpl implements DaoInterface {
     public boolean add(Author author, String imgPath) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        PreparedStatement cs = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO AUTHOR(ID,NAME,SURNAME,BIRTH_DATE,DEATH_DATE,IMG) "
+        String sql = "INSERT INTO AUTHOR(ID,NAME,SURNAME,BIRTH_DATE,DEATH_DATE,IMG) \n"
                 + " VALUES(AUTHOR_SEQ.NEXTVAL,?,?,?,?,?)";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, author.getName());
-                ps.setString(2, author.getSurname());
-                ps.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
-                ps.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
+                cs = c.prepareStatement(sql);
+                cs.setString(1, author.getName());
+                cs.setString(2, author.getSurname());
+                cs.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
+                cs.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
                 if (imgPath != null) {
                     InputStream in = new FileInputStream(imgPath);
-                    ps.setBinaryStream(5, in);
+                    cs.setBinaryStream(5, in);
                 } else {
                     imgPath = "C:\\Users\\Windows10\\Desktop\\JAVA\\DESKTOP\\DESKTOP_IMG\\nophoto.png";
                     InputStream in = new FileInputStream(imgPath);
-                    ps.setBinaryStream(5, in);
+                    cs.setBinaryStream(5, in);
                 }
-                ps.execute();
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -902,7 +905,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -995,19 +998,18 @@ public class DaoImpl implements DaoInterface {
     public boolean add(Product product) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO PRODUCT(ID,PRODUCT_NAME,NUM,AMOUNT,PRICE) "
-                + " VALUES(PRODUCT_SEQ.NEXTVAL,?,?,?,?)";
+        String sql = "{call PRODUCT_ADD(?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, product.getProductName());
-                ps.setInt(2, product.getNum());
-                ps.setFloat(3, product.getAmount());
-                ps.setFloat(4, product.getPrice());
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, product.getProductName());
+                cs.setInt(2, product.getNum());
+                cs.setFloat(3, product.getAmount());
+                cs.setFloat(4, product.getPrice());
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1017,7 +1019,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1026,17 +1028,16 @@ public class DaoImpl implements DaoInterface {
     public boolean add(Menu menu) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO MENU(ID,MENU_NAME,PRICE) "
-                + " VALUES(MENU_SEQ.NEXTVAL,?,?)";
+        String sql = "{call MENU_ADD(?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, menu.getMenuName());
-                ps.setFloat(2, menu.getPrice());
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, menu.getMenuName());
+                cs.setFloat(2, menu.getPrice());
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1046,7 +1047,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1055,15 +1056,17 @@ public class DaoImpl implements DaoInterface {
     public Author getAuthorById(Long authorId) throws Exception {
         Author author = new Author();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM r,ID,NAME,SURNAME,BIRTH_DATE,DEATH_DATE,ADVANCE_INFO FROM AUTHOR WHERE (ACTIVE = 1) AND (ID = ?)";
+        String sql = "{? = call AUTHOR_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, authorId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, authorId);
+                cs.execute();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
 
                     author.setRowNum(rs.getLong("r"));
@@ -1082,7 +1085,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return author;
@@ -1092,17 +1095,18 @@ public class DaoImpl implements DaoInterface {
     public Student getStudentById(Long studentId) throws Exception {
         Student student = new Student();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM r,ID,NAME,SURNAME,STUDENT_GROUP,PHONE,EMAIL FROM STUDENT WHERE (ACTIVE = 1) AND (ID = ?) ";
+        String sql = "{? = call STUDENT_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, studentId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, studentId);
+                cs.execute();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
-
                     student.setRowNum(rs.getLong("r"));
                     student.setId(rs.getLong("ID"));
                     student.setName(rs.getString("NAME"));
@@ -1110,18 +1114,15 @@ public class DaoImpl implements DaoInterface {
                     student.setGroup(rs.getString("STUDENT_GROUP"));
                     student.setPhone(rs.getString("PHONE"));
                     student.setEmail(rs.getString("EMAIL"));
-
                 }
             } else {
                 System.out.println("Connection is failuare!!!");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
-
         return student;
     }
 
@@ -1129,17 +1130,18 @@ public class DaoImpl implements DaoInterface {
     public Employee getEmployeeById(Long employeeId) throws Exception {
         Employee employee = new Employee();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM r,ID,NAME,SURNAME,PHONE,ADRESS,WORK_DAY,SALARY,EMAIL FROM EMPLOYEE WHERE (ACTIVE  = 1) AND (ID = ?)";
+        String sql = "{? = call EMPLOYEE_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, employeeId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, employeeId);
+                cs.execute();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
-
                     employee.setRowNum(rs.getLong("r"));
                     employee.setId(rs.getLong("ID"));
                     employee.setName(rs.getString("NAME"));
@@ -1149,7 +1151,6 @@ public class DaoImpl implements DaoInterface {
                     employee.setWorkDay(rs.getString("WORK_DAY"));
                     employee.setSalary(rs.getFloat("SALARY"));
                     employee.setEmail(rs.getString("EMAIL"));
-
                 }
             } else {
                 System.out.println("Connection is failuare!!!");
@@ -1158,9 +1159,8 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
-
         return employee;
     }
 
@@ -1168,23 +1168,17 @@ public class DaoImpl implements DaoInterface {
     public Book getBookById(Long bookId) throws Exception {
         Book book = new Book();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM r,BOOK.ID,BOOK.TITLE,BOOK.COPIES,BOOK.PRICE, "
-                + " BOOK_STATUS.ID book_status_id,"
-                + " BOOK_TIP.ID book_tip_id ,BOOK_STATUS.STATUS_NAME,BOOK_TIP.TIP , "
-                + " SHELF.ID shelf_id,SHELF.NAME,BOOK.PAGE_NUM  "
-                + " FROM BOOK "
-                + " INNER JOIN BOOK_STATUS ON BOOK_STATUS.ID = BOOK.BOOK_STATUS_ID "
-                + " INNER JOIN BOOK_TIP ON  BOOK_TIP.ID = BOOK.BOOK_TIP_ID "
-                + " INNER JOIN SHELF ON  SHELF.ID = BOOK.SHELF_ID "
-                + " WHERE (BOOK.ACTIVE = 1) AND (BOOK.ID = ?)";
+        String sql = "{? = call BOOK_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, bookId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, bookId);
+                cs.execute();
+                rs = cs.executeQuery();
                 while (rs.next()) {
                     BookStatus bookStatus = new BookStatus();
                     bookStatus.setId(rs.getLong("book_status_id"));
@@ -1217,7 +1211,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return book;
@@ -1227,15 +1221,17 @@ public class DaoImpl implements DaoInterface {
     public Product getProductById(Long productId) throws Exception {
         Product product = new Product();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM r,ID,PRODUCT_NAME,NUM,PRICE,AMOUNT FROM PRODUCT WHERE (ACTIVE = 1) AND (ID = ?)";
+        String sql = "{? = call PRODUCT_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, productId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, productId);
+                cs.execute();
+                rs = cs.executeQuery();
                 while (rs.next()) {
 
                     product.setRowNum(rs.getLong("r"));
@@ -1253,7 +1249,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return product;
@@ -1263,17 +1259,17 @@ public class DaoImpl implements DaoInterface {
     public boolean updateMenu(Menu menu, Long menuId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE MENU SET MENU_NAME = ? , PRICE = ? WHERE ID = ?";
+        String sql = "{call UPDATE_MENU(?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, menu.getMenuName());
-                ps.setFloat(2, menu.getPrice());
-                ps.setLong(3, menuId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, menu.getMenuName());
+                cs.setFloat(2, menu.getPrice());
+                cs.setLong(3, menuId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1283,7 +1279,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1292,25 +1288,23 @@ public class DaoImpl implements DaoInterface {
     public boolean updateAuthor(Author author, Long authorId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE AUTHOR SET NAME = ? , SURNAME = ? , BIRTH_DATE =  ? , DEATH_DATE = ? WHERE ID = ?";
+        String sql = "{call UPDATE_AUTHOR(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, author.getName());
-                ps.setString(2, author.getSurname());
-                ps.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
+                cs = c.prepareCall(sql);
+                cs.setString(1, author.getName());
+                cs.setString(2, author.getSurname());
+                cs.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
                 if (author.getDeathDate() != null) {
-                    ps.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
+                    cs.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
                 } else {
-                    ps.setDate(4, null);
+                    cs.setDate(4, null);
                 }
-
-                ps.setLong(5, authorId);
-
-                ps.execute();
+                cs.setLong(5, authorId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1319,8 +1313,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1329,20 +1322,20 @@ public class DaoImpl implements DaoInterface {
     public boolean updateStudent(Student student, Long studentId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE STUDENT SET NAME = ? , SURNAME = ? , STUDENT_GROUP = ? ,PHONE = ? ,  EMAIL = ?  WHERE ID = ?";
+        String sql = "{call UPDATE_STUDENT(?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, student.getName());
-                ps.setString(2, student.getSurname());
-                ps.setString(3, student.getGroup());
-                ps.setString(4, student.getPhone());
-                ps.setString(5, student.getEmail());
-                ps.setLong(6, studentId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, student.getName());
+                cs.setString(2, student.getSurname());
+                cs.setString(3, student.getGroup());
+                cs.setString(4, student.getPhone());
+                cs.setString(5, student.getEmail());
+                cs.setLong(6, studentId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1352,7 +1345,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1361,23 +1354,22 @@ public class DaoImpl implements DaoInterface {
     public boolean updateEmployee(Employee employee, Long employeeId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE EMPLOYEE SET NAME = ? , SURNAME = ? , PHONE = ? , ADRESS  = ? , WORK_DAY = ? , "
-                + " SALARY = ? , EMAIL = ? WHERE ID = ?";
+        String sql = "{call UPDATE_EMPLOYEE(?,?,?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, employee.getName());
-                ps.setString(2, employee.getSurname());
-                ps.setString(3, employee.getPhone());
-                ps.setString(4, employee.getAddress());
-                ps.setString(5, employee.getWorkDay());
-                ps.setFloat(6, employee.getSalary());
-                ps.setString(7, employee.getEmail());
-                ps.setLong(8, employeeId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, employee.getName());
+                cs.setString(2, employee.getSurname());
+                cs.setString(3, employee.getPhone());
+                cs.setString(4, employee.getAddress());
+                cs.setString(5, employee.getWorkDay());
+                cs.setFloat(6, employee.getSalary());
+                cs.setString(7, employee.getEmail());
+                cs.setLong(8, employeeId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1387,7 +1379,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1396,23 +1388,22 @@ public class DaoImpl implements DaoInterface {
     public boolean updateBook(Book book, Long bookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE BOOK SET TITLE = ? , PAGE_NUM = ? , COPIES = ? , "
-                + "  PRICE = ? , BOOK_STATUS_ID = ? , BOOK_TIP_ID = ? , SHELF_ID = ? WHERE ID = ?";
+        String sql = "{call UPDATE_BOOK(?,?,?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, book.getTitle());
-                ps.setLong(2, book.getPageNum());
-                ps.setInt(3, book.getCopies());
-                ps.setFloat(4, book.getPrice());
-                ps.setLong(5, book.getBookStatus().getId());
-                ps.setLong(6, book.getBookTip().getId());
-                ps.setLong(7, book.getShelf().getId());
-                ps.setLong(8, bookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, book.getTitle());
+                cs.setLong(2, book.getPageNum());
+                cs.setInt(3, book.getCopies());
+                cs.setFloat(4, book.getPrice());
+                cs.setLong(5, book.getBookStatus().getId());
+                cs.setLong(6, book.getBookTip().getId());
+                cs.setLong(7, book.getShelf().getId());
+                cs.setLong(8, bookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1422,7 +1413,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1431,19 +1422,19 @@ public class DaoImpl implements DaoInterface {
     public boolean updateProduct(Product product, Long productId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE PRODUCT SET PRODUCT_NAME = ? , NUM = ? , PRICE = ? , AMOUNT = ? WHERE ID = ?";
+        String sql = "{call UPDATE_PRODUCT(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setString(1, product.getProductName());
-                ps.setInt(2, product.getNum());
-                ps.setFloat(3, product.getPrice());
-                ps.setFloat(4, product.getAmount());
-                ps.setLong(5, productId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setString(1, product.getProductName());
+                cs.setInt(2, product.getNum());
+                cs.setFloat(3, product.getPrice());
+                cs.setFloat(4, product.getAmount());
+                cs.setLong(5, productId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1453,7 +1444,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1462,15 +1453,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteMenu(Long menuId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE MENU SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_MENU(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, menuId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, menuId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1480,7 +1471,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1489,15 +1480,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteAuthor(Long authorId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE AUTHOR SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_AUTHOR(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, authorId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, authorId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1507,7 +1498,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1516,15 +1507,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteStudent(Long studentId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE STUDENT SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_STUDENT(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, studentId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, studentId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1534,7 +1525,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1543,15 +1534,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteEmployee(Long employeeId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE EMPLOYEE SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "call DELETE_EMPLOYEE(?)";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, employeeId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, employeeId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1561,7 +1552,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1570,15 +1561,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteBook(Long bookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE BOOK SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_BOOK(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, bookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, bookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1588,7 +1579,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1597,15 +1588,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteProduct(Long productId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE PRODUCT SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_PRODUCT(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, productId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, productId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1614,7 +1605,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1739,14 +1730,16 @@ public class DaoImpl implements DaoInterface {
     public List<BookStatus> getBookStatus() throws Exception {
         List<BookStatus> bookStatusList = new ArrayList<>();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM R,ID,STATUS_NAME FROM BOOK_STATUS WHERE ACTIVE = 1";
+        String sql = "{? = call BOOK_STATUS_LIST}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.execute();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
                     BookStatus status = new BookStatus();
                     status.setRowNum(rs.getLong("r"));
@@ -1762,7 +1755,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return bookStatusList;
@@ -1772,36 +1765,17 @@ public class DaoImpl implements DaoInterface {
     public List<OrderBook> getOrderBookList(Long statusId) throws Exception {
         List<OrderBook> orderBookList = new ArrayList<>();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM             r,\n"
-                + "       ORDER_BOOK.ID,\n"
-                + "       ORDER_BOOK.BORROW_TIME,\n"
-                + "       ORDER_BOOK.PRICE BORROW_PRICE,\n"
-                + "       BOOK.ID            book_id,\n"
-                + "       BOOK.TITLE,\n"
-                + "       BOOK.COPIES,\n"
-                + "       BOOK.PAGE_NUM,\n"
-                + "       BOOK_STATUS.ID     book_status_id,\n"
-                + "       BOOK_STATUS.STATUS_NAME,\n"
-                + "       STUDENT.ID         student_id,\n"
-                + "       STUDENT.NAME,\n"
-                + "       STUDENT.SURNAME,\n"
-                + "       STUDENT.EMAIL,\n"
-                + "       STUDENT.PHONE,\n"
-                + "       STUDENT.STUDENT_GROUP,\n"
-                + "       BOOK.PRICE         book_price\n"
-                + "  FROM ORDER_BOOK\n"
-                + "       INNER JOIN STUDENT ON STUDENT.ID = ORDER_BOOK.STUDENT_ID\n"
-                + "       INNER JOIN BOOK ON BOOK.ID = ORDER_BOOK.BOOK_ID\n"
-                + "       INNER JOIN BOOK_STATUS ON BOOK_STATUS.ID = ORDER_BOOK.BOOK_STATUS_ID\n"
-                + " WHERE ORDER_BOOK.ACTIVE = 1 AND BOOK_STATUS.ID = ?";
+        String sql = "{? = call ORDER_BOOK_LIST(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, statusId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, statusId);
+                cs.execute();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
                     OrderBook orderBook = new OrderBook();
                     orderBook.setRowNum(rs.getLong("r"));
@@ -1842,7 +1816,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return orderBookList;
@@ -1852,37 +1826,17 @@ public class DaoImpl implements DaoInterface {
     public OrderBook getOrderBookById(Long orderBookId, Long bookStatusId) throws Exception {
         OrderBook orderBook = new OrderBook();
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "SELECT ROWNUM             r,\n"
-                + "       ORDER_BOOK.ID,\n"
-                + "       ORDER_BOOK.BORROW_TIME,\n"
-                + "       ORDER_BOOK.PRICE BORROW_PRICE,\n"
-                + "       BOOK.ID            book_id,\n"
-                + "       BOOK.TITLE,\n"
-                + "       BOOK.COPIES,\n"
-                + "       BOOK.PAGE_NUM,\n"
-                + "       BOOK_STATUS.ID     book_status_id,\n"
-                + "       BOOK_STATUS.STATUS_NAME,\n"
-                + "       STUDENT.ID         student_id,\n"
-                + "       STUDENT.NAME,\n"
-                + "       STUDENT.SURNAME,\n"
-                + "       STUDENT.EMAIL,\n"
-                + "       STUDENT.PHONE,\n"
-                + "       STUDENT.STUDENT_GROUP,\n"
-                + "       BOOK.PRICE         book_price\n"
-                + "  FROM ORDER_BOOK\n"
-                + "       INNER JOIN STUDENT ON STUDENT.ID = ORDER_BOOK.STUDENT_ID\n"
-                + "       INNER JOIN BOOK ON BOOK.ID = ORDER_BOOK.BOOK_ID\n"
-                + "       INNER JOIN BOOK_STATUS ON BOOK_STATUS.ID = ORDER_BOOK.BOOK_STATUS_ID\n"
-                + " WHERE (ORDER_BOOK.ACTIVE = 1) AND (BOOK_STATUS.ID = ? AND ORDER_BOOK.ID = ?)";
+        String sql = "{? = call ORDER_BOOK_BY_ID(?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, bookStatusId);
-                ps.setLong(2, orderBookId);
-                rs = ps.executeQuery();
+                cs = c.prepareCall(sql);
+                cs.registerOutParameter(1, OracleTypes.CURSOR);
+                cs.setLong(2, bookStatusId);
+                cs.setLong(3, orderBookId);
+                rs = (ResultSet) cs.getObject(1);
                 if (rs.next()) {
                     orderBook.setRowNum(rs.getLong("r"));
                     orderBook.setId(rs.getLong("ID"));
@@ -1920,7 +1874,7 @@ public class DaoImpl implements DaoInterface {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            Utility.close(c, ps, rs);
+            Utility.close(c, cs, rs);
         }
 
         return orderBook;
@@ -1930,18 +1884,18 @@ public class DaoImpl implements DaoInterface {
     public boolean updateSoldBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE ORDER_BOOK SET STUDENT_ID = ? , BOOK_ID = ? , PRICE = ? WHERE ID = ?";
+        String sql = "{call UPDATE_SOLD_BOOK(?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, orderBook.getStudent().getId());
-                ps.setLong(2, orderBook.getBook().getId());
-                ps.setFloat(3, orderBook.getPrice());
-                ps.setLong(4, orderBookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, orderBook.getStudent().getId());
+                cs.setLong(2, orderBook.getBook().getId());
+                cs.setFloat(3, orderBook.getPrice());
+                cs.setLong(4, orderBookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1951,7 +1905,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1960,15 +1914,15 @@ public class DaoImpl implements DaoInterface {
     public boolean deleteOrderBook(Long orderBookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE ORDER_BOOK SET ACTIVE = 0 WHERE ID = ?";
+        String sql = "{call DELETE_ORDER_BOOK(?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, orderBookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, orderBookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -1978,7 +1932,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -1987,19 +1941,19 @@ public class DaoImpl implements DaoInterface {
     public boolean updateBorrowBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE ORDER_BOOK SET STUDENT_ID = ? , BOOK_ID = ? , PRICE = ? , BORROW_TIME = ? WHERE ID = ?";
+        String sql = "{call UPDATE_BORROW_BOOK(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, orderBook.getStudent().getId());
-                ps.setLong(2, orderBook.getBook().getId());
-                ps.setFloat(3, orderBook.getPrice());
-                ps.setDate(4, new java.sql.Date(orderBook.getBorrowTime().getTime()));
-                ps.setLong(5, orderBookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, orderBook.getStudent().getId());
+                cs.setLong(2, orderBook.getBook().getId());
+                cs.setFloat(3, orderBook.getPrice());
+                cs.setDate(4, new java.sql.Date(orderBook.getBorrowTime().getTime()));
+                cs.setLong(5, orderBookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -2009,7 +1963,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
@@ -2018,17 +1972,17 @@ public class DaoImpl implements DaoInterface {
     public boolean updateReadNowBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
         Connection c = null;
-        PreparedStatement ps = null;
+        CallableStatement cs = null;
         ResultSet rs = null;
-        String sql = "UPDATE ORDER_BOOK SET STUDENT_ID = ? , BOOK_ID = ?  WHERE ID = ?";
+        String sql = "{call UPDATE_READNOW_BOOK(?,?,?)}";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                ps = c.prepareStatement(sql);
-                ps.setLong(1, orderBook.getStudent().getId());
-                ps.setLong(2, orderBook.getBook().getId());
-                ps.setLong(3, orderBookId);
-                ps.execute();
+                cs = c.prepareCall(sql);
+                cs.setLong(1, orderBook.getStudent().getId());
+                cs.setLong(2, orderBook.getBook().getId());
+                cs.setLong(3, orderBookId);
+                cs.execute();
                 result = true;
                 c.commit();
             } else {
@@ -2038,7 +1992,7 @@ public class DaoImpl implements DaoInterface {
             e.printStackTrace();
         } finally {
 
-            util.Utility.close(c, ps, rs);
+            util.Utility.close(c, cs, rs);
         }
         return result;
     }
