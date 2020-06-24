@@ -27,22 +27,25 @@ import model.Table;
 import model.TableOrder;
 import model.TableStatus;
 import oracle.jdbc.OracleTypes;
-import oracle.jdbc.oracore.OracleType;
 import util.Utility;
 
 public class DaoImpl implements DaoInterface {
 
-    // TODO: Write Query with PL-SQL 
-    // TODO: Design Patterns
-    // TODO : look at theese lines 1610-1725 and write query method with pl-sql 
-    // TODO : you was working at 2000 lines 
-    
+    private Connection c;
+    private CallableStatement cs;
+    private PreparedStatement ps;
+    private ResultSet rs;
+
+    public DaoImpl() {
+        this.rs = null;
+        this.cs = null;
+        this.c = null;
+        this.ps = null;
+    }
+
     @Override
     public List<Author> getAuthorList() throws Exception {
         List<Author> authorList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{?  = call AUTHOR_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -79,9 +82,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Student> getStudentList() throws Exception {
         List<Student> studentList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call GET_STUDENT_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -118,9 +118,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public byte[] getAuthorPhotoById(Long authorId) throws Exception {
         Author author = new Author();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call GET_AUTHOR_PHOTO(?)}";
         byte[] img = null;
         try {
@@ -149,9 +146,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public byte[] getStudentPhotoById(Long studentId) throws Exception {
         Student student = new Student();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call GET_STUDENT_PHOTO(?)}";
         byte[] img = null;
         try {
@@ -180,9 +174,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Employee> getEmployeeList() throws Exception {
         List<Employee> employeeList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call GET_EMPLOYEE_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -221,9 +212,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public byte[] getEmployeePhotoById(Long employeeId) throws Exception {
         Employee employee = new Employee();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call GET_EMPLOYEE_PHOTO(?)}";
         byte[] img = null;
         try {
@@ -252,9 +240,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Book> getBookList() throws Exception {
         List<Book> bookList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call BOOK_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -306,9 +291,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public byte[] getBookPhotoById(Long bookId) throws Exception {
         Book book = new Book();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call BOOK_PHOTO(?)}";
         byte[] img = null;
         try {
@@ -337,9 +319,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Menu> getMenuList() throws Exception {
         List<Menu> menuList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call MENU_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -374,9 +353,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Product> getProductList() throws Exception {
         List<Product> productList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call PRODUCT_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -412,9 +388,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<SendEmail> getSendEmailList() throws Exception {
         List<SendEmail> sendEmailList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call SEND_EMAIL_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -462,9 +435,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<OnlyOrder> getOnlyOrderList() throws Exception {
         List<OnlyOrder> orderList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{ ? = call ONLY_ORDER_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -506,9 +476,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Note> getNoteList() throws Exception {
         List<Note> noteList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{?  = call NOTE_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -543,9 +510,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<TableOrder> getTableOrderList() throws Exception {
         List<TableOrder> tableOrderList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call TABLE_ORDER_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -596,9 +560,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Paid> getPaidList() throws Exception {
         List<Paid> paidList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call PAID_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -656,9 +617,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Table> getTableList() throws Exception {
         List<Table> tableList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call TABLE_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -698,9 +656,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(OnlyOrder order) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{call ADD_ONLY_ORDER(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -729,9 +684,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Menu getMenuById(Long menuId) throws Exception {
         Menu menu = new Menu();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{ ? = call  MENU_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -765,9 +717,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<BookTip> getBookTipList() throws Exception {
         List<BookTip> bookTipList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call BOOK_TIP_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -800,9 +749,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Shelf> getShelfList() throws Exception {
         List<Shelf> shelfList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call BOOK_SHELF_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -835,9 +781,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Student student, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = " INSERT INTO STUDENT(ID,NAME,SURNAME,STUDENT_GROUP,PHONE,EMAIL,IMG) "
                 + "  VALUES(STUDENT_SEQ.NEXTVAL,?,?,?,?,?,?)";
         try {
@@ -874,26 +818,23 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Author author, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement cs = null;
-        ResultSet rs = null;
         String sql = "INSERT INTO AUTHOR(ID,NAME,SURNAME,BIRTH_DATE,DEATH_DATE,IMG) \n"
                 + " VALUES(AUTHOR_SEQ.NEXTVAL,?,?,?,?,?)";
         try {
             c = DbHelper.getConnection();
             if (c != null) {
-                cs = c.prepareStatement(sql);
-                cs.setString(1, author.getName());
-                cs.setString(2, author.getSurname());
-                cs.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
-                cs.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
+                ps = c.prepareStatement(sql);
+                ps.setString(1, author.getName());
+                ps.setString(2, author.getSurname());
+                ps.setDate(3, new java.sql.Date(author.getBirthDate().getTime()));
+                ps.setDate(4, new java.sql.Date(author.getDeathDate().getTime()));
                 if (imgPath != null) {
                     InputStream in = new FileInputStream(imgPath);
-                    cs.setBinaryStream(5, in);
+                    ps.setBinaryStream(5, in);
                 } else {
                     imgPath = "C:\\Users\\Windows10\\Desktop\\JAVA\\DESKTOP\\DESKTOP_IMG\\nophoto.png";
                     InputStream in = new FileInputStream(imgPath);
-                    cs.setBinaryStream(5, in);
+                    ps.setBinaryStream(5, in);
                 }
                 cs.execute();
                 result = true;
@@ -913,9 +854,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Employee employee, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO  EMPLOYEE(ID,NAME,SURNAME,PHONE,ADRESS,WORK_DAY,SALARY,EMAIL,IMG) "
                 + " VALUES(EMPLOYEE_SEQ.NEXTVAL,?,?,?,?,?,?,?,?)";
         try {
@@ -955,9 +894,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Book book, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO BOOK(ID,TITLE,PAGE_NUM,COPIES,BOOK_IMG,PRICE,BOOK_STATUS_ID,BOOK_TIP_ID,SHELF_ID) "
                 + " VALUES(BOOK_SEQ.NEXTVAL,?,?,?,?,?,?,?,?)";
         try {
@@ -997,9 +934,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Product product) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call PRODUCT_ADD(?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1027,9 +962,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Menu menu) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call MENU_ADD(?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1055,9 +988,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Author getAuthorById(Long authorId) throws Exception {
         Author author = new Author();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call AUTHOR_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1094,9 +1025,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Student getStudentById(Long studentId) throws Exception {
         Student student = new Student();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call STUDENT_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1129,9 +1058,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Employee getEmployeeById(Long employeeId) throws Exception {
         Employee employee = new Employee();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call EMPLOYEE_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1167,9 +1094,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Book getBookById(Long bookId) throws Exception {
         Book book = new Book();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{? = call BOOK_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1178,7 +1102,7 @@ public class DaoImpl implements DaoInterface {
                 cs.registerOutParameter(1, OracleTypes.CURSOR);
                 cs.setLong(2, bookId);
                 cs.execute();
-                rs = cs.executeQuery();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
                     BookStatus bookStatus = new BookStatus();
                     bookStatus.setId(rs.getLong("book_status_id"));
@@ -1220,9 +1144,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Product getProductById(Long productId) throws Exception {
         Product product = new Product();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call PRODUCT_BY_ID(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1231,7 +1153,7 @@ public class DaoImpl implements DaoInterface {
                 cs.registerOutParameter(1, OracleTypes.CURSOR);
                 cs.setLong(2, productId);
                 cs.execute();
-                rs = cs.executeQuery();
+                rs = (ResultSet) cs.getObject(1);
                 while (rs.next()) {
 
                     product.setRowNum(rs.getLong("r"));
@@ -1258,9 +1180,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateMenu(Menu menu, Long menuId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_MENU(?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1287,9 +1207,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateAuthor(Author author, Long authorId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_AUTHOR(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1321,9 +1239,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateStudent(Student student, Long studentId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_STUDENT(?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1353,9 +1269,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateEmployee(Employee employee, Long employeeId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{call UPDATE_EMPLOYEE(?,?,?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1387,9 +1300,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateBook(Book book, Long bookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{call UPDATE_BOOK(?,?,?,?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1421,9 +1331,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateProduct(Product product, Long productId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
         String sql = "{call UPDATE_PRODUCT(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1479,9 +1386,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteAuthor(Long authorId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call DELETE_AUTHOR(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1506,9 +1411,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteStudent(Long studentId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call DELETE_STUDENT(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1533,9 +1436,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteEmployee(Long employeeId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "call DELETE_EMPLOYEE(?)";
         try {
             c = DbHelper.getConnection();
@@ -1560,9 +1461,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteBook(Long bookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call DELETE_BOOK(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1587,9 +1486,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteProduct(Long productId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call DELETE_PRODUCT(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1613,9 +1510,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateAuthorImg(Long authorId, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE AUTHOR SET IMG = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -1642,9 +1537,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateStudentImg(Long studentId, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE STUDENT SET IMG = ?  WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -1671,9 +1564,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateEmployeeImg(Long employeeId, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE EMPLOYEE SET IMG = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -1700,9 +1591,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateBookImg(Long bookId, String imgPath) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE BOOK SET BOOK_IMG = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -1729,9 +1618,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<BookStatus> getBookStatus() throws Exception {
         List<BookStatus> bookStatusList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call BOOK_STATUS_LIST}";
         try {
             c = DbHelper.getConnection();
@@ -1764,9 +1651,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<OrderBook> getOrderBookList(Long statusId) throws Exception {
         List<OrderBook> orderBookList = new ArrayList<>();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call ORDER_BOOK_LIST(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1825,9 +1710,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public OrderBook getOrderBookById(Long orderBookId, Long bookStatusId) throws Exception {
         OrderBook orderBook = new OrderBook();
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{? = call ORDER_BOOK_BY_ID(?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1883,9 +1766,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateSoldBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_SOLD_BOOK(?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1913,9 +1794,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteOrderBook(Long orderBookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call DELETE_ORDER_BOOK(?)}";
         try {
             c = DbHelper.getConnection();
@@ -1940,9 +1819,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateBorrowBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_BORROW_BOOK(?,?,?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -1971,9 +1848,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateReadNowBook(OrderBook orderBook, Long orderBookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        CallableStatement cs = null;
-        ResultSet rs = null;
+
         String sql = "{call UPDATE_READNOW_BOOK(?,?,?)}";
         try {
             c = DbHelper.getConnection();
@@ -2000,9 +1875,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean addSoldBook(OrderBook orderBook) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO ORDER_BOOK(ID,STUDENT_ID,BOOK_ID,BOOK_STATUS_ID,PRICE) "
                 + " VALUES(ORDER_BOOK_SEQ.NEXTVAL,?,?,?,?)";
         try {
@@ -2031,9 +1904,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateBookNum(int copies, Long bookId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE BOOK SET COPIES = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -2059,9 +1930,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean addBorrowBook(OrderBook orderBook) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO ORDER_BOOK(ID,STUDENT_ID,BOOK_ID,BOOK_STATUS_ID,PRICE,BORROW_TIME) "
                 + " VALUES(ORDER_BOOK_SEQ.NEXTVAL,?,?,?,?,?)";
         try {
@@ -2091,9 +1960,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean addReadNowBook(OrderBook orderBook) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO ORDER_BOOK(ID,STUDENT_ID,BOOK_ID,BOOK_STATUS_ID) "
                 + " VALUES(ORDER_BOOK_SEQ.NEXTVAL,?,?,?)";
         try {
@@ -2121,9 +1988,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(TableOrder tableOrder) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "INSERT INTO TABLE_ORDER(ID,TABLE_ID,ONLY_ORDER_ID,RES_NAME) "
                 + " VALUES(TABLE_ORDER_SEQ.NEXTVAL,?,?,?)";
         try {
@@ -2151,9 +2016,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteOnlyOrder(Long onlyOrderId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE ONLY_ORDER SET ACTIVE = 0 WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -2178,9 +2041,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean changeTableStatus(Long tableId, Long tableStatusId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE LIB_TABLE SET TABLE_STATUS_ID = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -2206,9 +2067,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public OnlyOrder getOnlyOrderById(Long onlyOrderId) throws Exception {
         OnlyOrder order = new OnlyOrder();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,ONLY_ORDER.ID ,ONLY_ORDER.NUM,ONLY_ORDER.T_ORDER, "
                 + " ONLY_ORDER.PRICE,MENU.ID menu_id ,MENU.MENU_NAME, ONLY_ORDER.RES_NAME FROM ONLY_ORDER "
                 + " INNER JOIN MENU ON MENU.ID = ONLY_ORDER.MENU_ID WHERE (ONLY_ORDER.ACTIVE = 1 AND ONLY_ORDER.ID = ?)";
@@ -2249,9 +2108,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public TableOrder getTableOrderById(Long tableOrderId) throws Exception {
         TableOrder tableOrder = new TableOrder();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,TABLE_ORDER.ID,TABLE_ORDER.RES_NAME,LIB_TABLE.ID table_id,LIB_TABLE.LIB_TABLE, "
                 + " ONLY_ORDER.ID order_id, "
                 + " ONLY_ORDER.NUM,ONLY_ORDER.PRICE,ONLY_ORDER.T_ORDER, "
@@ -2306,9 +2163,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<TableOrder> getTableOrderByTableId(Long tableId) throws Exception {
         List<TableOrder> tableOrderList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,TABLE_ORDER.ID,TABLE_ORDER.RES_NAME,LIB_TABLE.ID table_id,LIB_TABLE.LIB_TABLE, "
                 + " ONLY_ORDER.ID order_id, "
                 + " ONLY_ORDER.NUM,ONLY_ORDER.PRICE,ONLY_ORDER.T_ORDER, "
@@ -2366,9 +2221,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateOnlyOrder(OnlyOrder onlyOrder, Long onlyOrderId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "UPDATE ONLY_ORDER SET NUM = ? , T_ORDER = ? , MENU_ID = ? , PRICE = ? , RES_NAME = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -2398,9 +2251,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updateTableOrder(TableOrder tableOrder, Long tableOrderId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = " UPDATE TABLE_ORDER SET TABLE_ID = ? , ONLY_ORDER_ID = ? , RES_NAME = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -2428,9 +2279,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Table> getTableListByStatusId(Long statusId) throws Exception {
         List<Table> tableList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,LIB_TABLE.ID,LIB_TABLE,TABLE_STATUS.ID table_status_id, "
                 + " TABLE_STATUS.STATUS_NAME FROM LIB_TABLE  "
                 + " INNER JOIN TABLE_STATUS ON TABLE_STATUS.ID = LIB_TABLE.TABLE_STATUS_ID "
@@ -2471,9 +2320,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public TableOrder getTableOrderListByTableId(Long tableId) throws Exception {
         TableOrder tableOrder = new TableOrder();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,TABLE_ORDER.ID,TABLE_ORDER.RES_NAME,LIB_TABLE.ID table_id,LIB_TABLE.LIB_TABLE, "
                 + " ONLY_ORDER.ID order_id, "
                 + " ONLY_ORDER.NUM,ONLY_ORDER.PRICE,ONLY_ORDER.T_ORDER, "
@@ -2528,9 +2375,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Student> searchStudent(String keyword) throws Exception {
         List<Student> studentList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM     r,\n"
                 + "       ID,\n"
                 + "       NAME,\n"
@@ -2582,9 +2427,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Author> searchAuthor(String keyword) throws Exception {
         List<Author> authorList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM     r,\n"
                 + "       ID,\n"
                 + "       NAME,\n"
@@ -2634,9 +2477,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Book> searchBook(String keyword) throws Exception {
         List<Book> bookList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM             r,\n"
                 + "       BOOK.ID,\n"
                 + "       BOOK.TITLE,\n"
@@ -2715,9 +2556,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Menu> searchMenu(String keyword) throws Exception {
         List<Menu> menuList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,ID,MENU_NAME,PRICE FROM MENU WHERE (ACTIVE = 1 )AND (LOWER(MENU_NAME) LIKE LOWER(?) OR LOWER(PRICE) LIKE LOWER(?))";
         try {
             c = DbHelper.getConnection();
@@ -2752,9 +2591,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<TableOrder> searchTableOrder(String keyword) throws Exception {
         List<TableOrder> tableOrderList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM            r,\n"
                 + "       TABLE_ORDER.ID,\n"
                 + "       TABLE_ORDER.RES_NAME,\n"
@@ -2830,9 +2667,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Product> searchProduct(String keyword) throws Exception {
         List<Product> productList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM     r,\n"
                 + "       ID,\n"
                 + "       PRODUCT_NAME,\n"
@@ -2880,9 +2715,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Employee> searchEmployee(String keyword) throws Exception {
         List<Employee> employeeList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM     r,\n"
                 + "       ID,\n"
                 + "       NAME,\n"
@@ -2942,9 +2775,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<SendEmail> searchEmail(String keyword) throws Exception {
         List<SendEmail> sendEmailList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM               r,\n"
                 + "       SEND_EMAIL.ID,\n"
                 + "       SEND_EMAIL.MESSAGE,\n"
@@ -3014,9 +2845,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<OrderBook> searchOrderBook(String keyword, Long statusId) throws Exception {
         List<OrderBook> orderBookList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM               r,\n"
                 + "       ORDER_BOOK.ID,\n"
                 + "       ORDER_BOOK.BORROW_TIME,\n"
@@ -3114,9 +2943,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Book> advancedSearchBook(AdvancedSearch advancedSearch) throws Exception {
         List<Book> bookList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM             r, "
                 + "       BOOK.ID, "
                 + "       BOOK.TITLE, "
@@ -3203,9 +3030,7 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Product> advancedSearchProduct(AdvancedSearch advancedSearch) throws Exception {
         List<Product> productList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+
         String sql = "SELECT ROWNUM r,ID,PRODUCT_NAME,NUM,PRICE,AMOUNT FROM PRODUCT WHERE ACTIVE = 1 ";
         try {
             c = DbHelper.getConnection();
@@ -3251,8 +3076,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean add(Paid paid) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
         String sql = "INSERT INTO PAID(ID,TABLE_ORDER_ID,PRICE) "
                 + " VALUES(PAID_SEQ.NEXTVAL,?,?)";
         try {
@@ -3279,8 +3102,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deleteTableOrderByTableId(Long tableId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
         String sql = "UPDATE TABLE_ORDER SET ACTIVE = 0 WHERE TABLE_ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -3305,9 +3126,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Paid> searchPaid(String keyword) throws Exception {
         List<Paid> paidList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         String sql = "SELECT ROWNUM               r,\n"
                 + "       PAID.ID,\n"
                 + "       PAID.PRICE,\n"
@@ -3385,9 +3203,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public List<Paid> advancedSearchPaid(AdvancedSearch advancedSearch) throws Exception {
         List<Paid> paidList = new ArrayList<>();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         String sql = "SELECT ROWNUM r,PAID.ID, PAID.PRICE,PAID.PAID_DATE,TABLE_ORDER.ID table_order_id, "
                 + " TABLE_ORDER.RES_NAME,LIB_TABLE.ID table_id, "
                 + " LIB_TABLE.LIB_TABLE,ONLY_ORDER.ID order_id, "
@@ -3460,8 +3275,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean deletePaid(Long paidId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
         String sql = "UPDATE PAID SET ACTIVE = 0 WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -3486,9 +3299,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public Paid getPaidById(Long paidId) throws Exception {
         Paid paid = new Paid();
-        Connection c = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
         String sql = "SELECT ROWNUM r,PAID.ID, PAID.PRICE,PAID.PAID_DATE,TABLE_ORDER.ID table_order_id, "
                 + " TABLE_ORDER.RES_NAME,LIB_TABLE.ID table_id, "
                 + " LIB_TABLE.LIB_TABLE,ONLY_ORDER.ID order_id, "
@@ -3554,8 +3364,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean updatePaid(Paid paid, Long paidId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
         String sql = "UPDATE PAID SET PRICE = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
@@ -3581,8 +3389,6 @@ public class DaoImpl implements DaoInterface {
     @Override
     public boolean changeTableInPaidTable(Long tableId, Long tableOrderId) throws Exception {
         boolean result = false;
-        Connection c = null;
-        PreparedStatement ps = null;
         String sql = "UPDATE TABLE_ORDER SET TABLE_ID = ? WHERE ID = ?";
         try {
             c = DbHelper.getConnection();
