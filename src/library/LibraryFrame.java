@@ -47,7 +47,7 @@ import model.Table;
 import model.TableOrder;
 
 public class LibraryFrame extends ColumnSize {
-    
+
     private DaoImpl dao;
     private JFrame frame;
     private String globCheckName = "0";
@@ -55,139 +55,141 @@ public class LibraryFrame extends ColumnSize {
     private int isDeleteMsg;
     private ColumnSize columnSize;
     private HideId hide;
-    
+
     public LibraryFrame() {
+        columnName = new ColumnName();
+        iconRenderer = new IconRenderer();
         hide = new HideId();
         columnSize = new ColumnSize();
         initComponents();
-        
+
     }
-    
+
     Timer updateTimer;
     int DELAY = 1;
-    
-    LibraryFrame(DaoImpl dao) {
+
+    public LibraryFrame(DaoImpl dao) {
+        columnName = new ColumnName();
+        iconRenderer = new IconRenderer();
         hide = new HideId();
         columnSize = new ColumnSize();
         try {
             initComponents();
             this.dao = dao;
-            tablePageHover.setOpaque(false);
-            studentPageHover.setOpaque(false);
-            authorPageHover.setOpaque(false);
-            orderPageHover.setOpaque(false);
-            emailPageHover.setOpaque(false);
-            calcPageHover.setOpaque(false);
-            bookPageHover.setOpaque(false);
-            menuPageHover.setOpaque(false);
-            employeePageHover.setOpaque(false);
-            
+
+            // set false label opaque
+            labelOpaque();
+
             frame = null;
-            
+
             Calendar cal = Calendar.getInstance();
             cal.getTime();
             SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
             time.setText(sdf.format(cal.getTime()));
             SimpleDateFormat dateSdf = new SimpleDateFormat("dd.MM.yyyy");
             date.setText(dateSdf.format(cal.getTime()));
-            
+
             updateTimer = new Timer(DELAY, new ActionListener() {
-                
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     Date currentTime = new Date();
                     String formatTimeStr = "HH:mm:ss";
                     DateFormat formatTime = new SimpleDateFormat(formatTimeStr);
                     String formattedTimeStr = formatTime.format(currentTime);
-                    
+
                     time.setText(formattedTimeStr);
-                    
+
                 }
             });
-            
+
             updateTimer.start();
-            
-            Font f = new Font("Calibri", Font.ITALIC, 18);
-            JTableHeader header = warningTable.getTableHeader();
-            header.setFont(f);
-            header.setForeground(Color.black);
-            
-            ((DefaultTableCellRenderer) header.getDefaultRenderer())
-                    .setHorizontalAlignment(JLabel.CENTER);
 
-//        warningTable.getTableHeader().setOpaque(false);
-//        warningTable.getTableHeader().setBackground(new Color(0).red);
-            tablePageContentOnLay.setVisible(false);
-            studentsPageContentOnLay.setVisible(false);
-            bookPageContentOnLay.setVisible(false);
-            authorPageContentOnLay.setVisible(false);
-            menuPageContentOnLay.setVisible(false);
-            orderPageContentOnLay.setVisible(false);
-            calcPageContentOnLay.setVisible(false);
-            emailPageContentOnLay.setVisible(false);
-            employeePageContentOnLay.setVisible(false);
-            orderBookPageContentOnLay.setVisible(false);
-            bookAdvancedSearchPageContentOnLay.setVisible(false);
+            tableHeaderRenderer();
 
-            ////
-            soldBookPageContentOnLay.setVisible(false);
-            borrowBookPageContentOnLay.setVisible(false);
-            ////
-            List<Author> authorList = dao.getAuthorList();
-            ViewAuthorListInTable(authorList);
-            
-            List<Student> studentList = dao.getStudentList();
-            ViewStudentListInTable(studentList);
-            
-            List<Employee> employeeList = dao.getEmployeeList();
-            ViewEmployeeListInTable(employeeList);
-            
-            List<Book> bookList = dao.getBookList();
-            ViewBookListInTable(bookList);
-            
-            List<Menu> menuList = dao.getMenuList();
-            ViewMenuListInTable(menuList);
-            
-            List<Product> productList = dao.getProductList();
-            ViewProductListInTable(productList);
-            
-            List<SendEmail> sendEmailList = dao.getSendEmailList();
-            ViewSendEmailList(sendEmailList);
-            
-            for (Student student : studentList) {
-                studentsNumText.setText(student.getRowNum().toString());
-            }
-            for (Book book : bookList) {
-                bookNumText.setText(book.getRowNum().toString());
-            }
-            for (Employee employee : employeeList) {
-                employeeNumText.setText(employee.getRowNum().toString());
-            }
-            
-            Font f2 = new Font("Calibri", Font.ITALIC, 18);
-            JTableHeader header2 = notesTable.getTableHeader();
-            header2.setFont(f2);
-            
-            List<Note> noteList = dao.getNoteList();
-            ViewNoteListInTable(noteList);
-            
-            List<TableOrder> tableOrderList = dao.getTableOrderList();
-            ViewTableOrderListInTable(tableOrderList);
-            
-            List<Paid> paidList = dao.getPaidList();
-            ViewPaidListInTable(paidList);
-            
-            String protocol = "imap";
-            String host = "imap.gmail.com";
-            String port = "993";
-            
-            String userName = "bshelf17@gmail.com";
-            String password = "mamed2001";
-            
+            //each page content visibility
+            contentVisible();
+            mainPageContentOnLay.setVisible(true);
+
+            // return all tables list 
+            listInTable(dao);
+
+            // number of students , books and employee in home page
+            homePageCardNums(dao.getStudentList(), dao.getBookList(), dao.getEmployeeList());
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
+    }
+
+    private void tableHeaderRenderer() {
+        Font f = new Font("Calibri", Font.ITALIC, 18);
+        JTableHeader header = warningTable.getTableHeader();
+        header.setFont(f);
+        header.setForeground(Color.black);
+
+        ((DefaultTableCellRenderer) header.getDefaultRenderer())
+                .setHorizontalAlignment(JLabel.CENTER);
+
+        Font f2 = new Font("Calibri", Font.ITALIC, 18);
+        JTableHeader header2 = notesTable.getTableHeader();
+        header2.setFont(f2);
+
+    }
+
+    private void listInTable(DaoImpl dao) throws Exception {
+        ViewAuthorListInTable(dao.getAuthorList());
+        ViewStudentListInTable(dao.getStudentList());
+        ViewEmployeeListInTable(dao.getEmployeeList());
+        ViewBookListInTable(dao.getBookList());
+        ViewMenuListInTable(dao.getMenuList());
+        ViewProductListInTable(dao.getProductList());
+        ViewSendEmailList(dao.getSendEmailList());
+        ViewNoteListInTable(dao.getNoteList());
+        ViewTableOrderListInTable(dao.getTableOrderList());
+        ViewPaidListInTable(dao.getPaidList());
+    }
+
+    private void homePageCardNums(List<Student> studentList, List<Book> bookList, List<Employee> employeeList) {
+        for (Student student : studentList) {
+            studentsNumText.setText(student.getRowNum().toString());
+        }
+        for (Book book : bookList) {
+            bookNumText.setText(book.getRowNum().toString());
+        }
+        for (Employee employee : employeeList) {
+            employeeNumText.setText(employee.getRowNum().toString());
+        }
+    }
+
+    private void contentVisible() {
+        tablePageContentOnLay.setVisible(false);
+        studentsPageContentOnLay.setVisible(false);
+        bookPageContentOnLay.setVisible(false);
+        authorPageContentOnLay.setVisible(false);
+        menuPageContentOnLay.setVisible(false);
+        orderPageContentOnLay.setVisible(false);
+        calcPageContentOnLay.setVisible(false);
+        emailPageContentOnLay.setVisible(false);
+        employeePageContentOnLay.setVisible(false);
+        orderBookPageContentOnLay.setVisible(false);
+        bookAdvancedSearchPageContentOnLay.setVisible(false);
+        soldBookPageContentOnLay.setVisible(false);
+        borrowBookPageContentOnLay.setVisible(false);
+        mainPageContentOnLay.setVisible(false);
+    }
+
+    private void labelOpaque() {
+        tablePageHover.setOpaque(false);
+        studentPageHover.setOpaque(false);
+        authorPageHover.setOpaque(false);
+        orderPageHover.setOpaque(false);
+        emailPageHover.setOpaque(false);
+        calcPageHover.setOpaque(false);
+        bookPageHover.setOpaque(false);
+        menuPageHover.setOpaque(false);
+        employeePageHover.setOpaque(false);
     }
 
     /**
@@ -3710,40 +3712,21 @@ public class LibraryFrame extends ColumnSize {
 
     private void mainPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainPageMouseClicked
         bar(mainPageHover);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
+        contentVisible();
         mainPageContentOnLay.setVisible(true);
         frame = null;
-        
+
 
     }//GEN-LAST:event_mainPageMouseClicked
 
     private void tablePageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablePageMouseClicked
         bar(tablePageHover);
-        mainPageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
+        contentVisible();
         tablePageContentOnLay.setVisible(true);
         frame = null;
-        
+
         buttonGroup1.clearSelection();
-        
+
         try {
             List<Table> tableList = dao.getTableListByStatusId((long) 2);
             for (Table table : tableList) {
@@ -3757,38 +3740,27 @@ public class LibraryFrame extends ColumnSize {
 
     private void studentPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studentPageMouseClicked
         bar(studentPageHover);
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        
+        contentVisible();
         studentsPageContentOnLay.setVisible(true);
-        
+
         studentsTable.getTableHeader().setOpaque(false);
         studentsTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
         Font f = new Font("Calibri", Font.ITALIC, 18);
         JTableHeader header = studentsTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
         frame = null;
-        
+
         studentsTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = studentsTable.rowAtPoint(e.getPoint());
                 int col = studentsTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = studentsTable.getSelectedRow();
                 Long selectedRow = (Long) studentsTable.getValueAt(rowIndex, 0);
                 if (col == StudentEnum.VIEW.getValue()) {
@@ -3803,7 +3775,7 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == StudentEnum.SEND_MESSAGE.getValue()) {
                     if (frame == null) {
@@ -3817,7 +3789,7 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == StudentEnum.EDIT.getValue()) {
                     if (frame == null) {
@@ -3831,13 +3803,13 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == StudentEnum.DELETE.getValue()) {
                     JLabel label = new JLabel("Tələbəni silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Tələbəni Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteStudent(selectedRow);
@@ -3851,28 +3823,17 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
-        
+
 
     }//GEN-LAST:event_studentPageMouseClicked
 
     private void bookPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookPageMouseClicked
         bar(bookPageHover);
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        
+        contentVisible();
         bookPageContentOnLay.setVisible(true);
         bookTable.getTableHeader().setOpaque(false);
         bookTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
@@ -3880,17 +3841,17 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = bookTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
         frame = null;
-        
+
         bookTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = bookTable.rowAtPoint(e.getPoint());
                 int col = bookTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = bookTable.getSelectedRow();
                 Long selectedRow = (Long) bookTable.getValueAt(rowIndex, 0);
                 if (col == BookEnum.VIEW.getValue()) {
@@ -3905,14 +3866,14 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == BookEnum.EDIT.getValue()) {
                     if (frame == null) {
                         EditBook editBook = new EditBook(dao, selectedRow);
                         editBook.setVisible(true);
                         frame = editBook;
-                        
+
                         editBook.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -3920,13 +3881,13 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == BookEnum.DELETE.getValue()) {
                     JLabel label = new JLabel("Kitabı silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Kitabı Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteBook(selectedRow);
@@ -3948,7 +3909,7 @@ public class LibraryFrame extends ColumnSize {
                                 AddOrderBookFrame addOrderBookFrame = new AddOrderBookFrame(dao, selectedRow);
                                 addOrderBookFrame.setVisible(true);
                                 frame = addOrderBookFrame;
-                                
+
                                 addOrderBookFrame.addWindowListener(new WindowAdapter() {
                                     @Override
                                     public void windowClosed(WindowEvent e) {
@@ -3970,28 +3931,18 @@ public class LibraryFrame extends ColumnSize {
                         Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
             }
         }
         );
-        
+
 
     }//GEN-LAST:event_bookPageMouseClicked
 
     private void authorPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_authorPageMouseClicked
         bar(authorPageHover);
         frame = null;
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
+        contentVisible();
         authorPageContentOnLay.setVisible(true);
         authorTable.getTableHeader().setOpaque(false);
         authorTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
@@ -3999,20 +3950,20 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = authorTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         authorTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = authorTable.rowAtPoint(e.getPoint());
                 int col = authorTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = authorTable.getSelectedRow();
                 Long selectedRow = (Long) authorTable.getValueAt(rowIndex, 0);
                 if (col == EnumSixToEight.VIEW.getValue() && frame == null) {
-                    
+
                     ViewAuthor viewAuthor = new ViewAuthor(dao, selectedRow);
                     viewAuthor.setVisible(true);
                     frame = viewAuthor;
@@ -4022,26 +3973,26 @@ public class LibraryFrame extends ColumnSize {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EnumSixToEight.EDIT.getValue() && frame == null) {
                     EditAuthor editAuthor = new EditAuthor(dao, selectedRow);
                     editAuthor.setVisible(true);
                     frame = editAuthor;
-                    
+
                     editAuthor.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EnumSixToEight.DELETE.getValue()) {
                     JLabel label = new JLabel("Müəllifi silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Müəllifi Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteAuthor(selectedRow);
@@ -4055,7 +4006,7 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
@@ -4065,17 +4016,7 @@ public class LibraryFrame extends ColumnSize {
     private void menuPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuPageMouseClicked
         bar(menuPageHover);
         frame = null;
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
+        contentVisible();
         menuPageContentOnLay.setVisible(true);
         menuTable.getTableHeader().setOpaque(false);
         menuTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
@@ -4083,16 +4024,16 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = menuTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         menuTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = menuTable.rowAtPoint(e.getPoint());
                 int col = menuTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = menuTable.getSelectedRow();
                 Long selectedRow = (Long) menuTable.getValueAt(rowIndex, 0);
                 if (col == MenuEnum.VIEW.getValue()) {
@@ -4107,14 +4048,14 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == MenuEnum.EDIT.getValue()) {
                     if (frame == null) {
                         EditMenu editMenu = new EditMenu(dao, selectedRow);
                         editMenu.setVisible(true);
                         frame = editMenu;
-                        
+
                         editMenu.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -4122,13 +4063,13 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == MenuEnum.DELETE.getValue()) {
                     JLabel label = new JLabel("Menyunu silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Menyunu Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteMenu(selectedRow);
@@ -4142,7 +4083,7 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
@@ -4152,17 +4093,7 @@ public class LibraryFrame extends ColumnSize {
     private void orderPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_orderPageMouseClicked
         bar(orderPageHover);
         frame = null;
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
+        contentVisible();
         orderPageContentOnLay.setVisible(true);
         orderTable.getTableHeader().setOpaque(false);
         orderTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
@@ -4170,16 +4101,16 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = orderTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         orderTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = orderTable.rowAtPoint(e.getPoint());
                 int col = orderTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = orderTable.getSelectedRow();
                 Long selectedRow = (Long) orderTable.getValueAt(rowIndex, 0);
                 if (col == EnumSixToEight.VIEW.getValue()) {
@@ -4194,14 +4125,14 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == EnumSixToEight.EDIT.getValue()) {
                     if (frame == null) {
                         EditTableOrder editTableOrder = new EditTableOrder(dao, selectedRow);
                         editTableOrder.setVisible(true);
                         frame = editTableOrder;
-                        
+
                         editTableOrder.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -4209,13 +4140,13 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == EnumSixToEight.DELETE.getValue()) {
                     JLabel label = new JLabel("Menyunu silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Menyunu Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteMenu(selectedRow);
@@ -4229,56 +4160,46 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
-        
+
 
     }//GEN-LAST:event_orderPageMouseClicked
 
     private void calcPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_calcPageMouseClicked
         bar(calcPageHover);
         frame = null;
-        mainPageContentOnLay.setVisible(false);
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
+        contentVisible();
         calcPageContentOnLay.setVisible(true);
-        
+
         paidTable.getTableHeader().setOpaque(false);
         paidTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
         Font f = new Font("Calibri", Font.ITALIC, 18);
         JTableHeader header = paidTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         productTable.getTableHeader().setOpaque(false);
         productTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
         Font f1 = new Font("Calibri", Font.ITALIC, 18);
         JTableHeader header1 = productTable.getTableHeader();
         header1.setFont(f1);
         header1.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header1.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         productTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = productTable.rowAtPoint(e.getPoint());
                 int col = productTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = productTable.getSelectedRow();
                 Long selectedRow = (Long) productTable.getValueAt(rowIndex, 0);
                 if (col == EnumSixToEight.VIEW.getValue() && frame == null) {
@@ -4291,27 +4212,27 @@ public class LibraryFrame extends ColumnSize {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EnumSixToEight.EDIT.getValue() && frame == null) {
-                    
+
                     EditProduct editProduct = new EditProduct(dao, selectedRow);
                     editProduct.setVisible(true);
                     frame = editProduct;
-                    
+
                     editProduct.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EnumSixToEight.DELETE.getValue()) {
                     JLabel label = new JLabel("Produktu silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Produktu Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteProduct(selectedRow);
@@ -4325,40 +4246,30 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
-        
+
 
     }//GEN-LAST:event_calcPageMouseClicked
 
     private void emailPageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_emailPageMouseClicked
         bar(emailPageHover);
         frame = null;
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        mainPageContentOnLay.setVisible(false);
+        contentVisible();
         emailPageContentOnLay.setVisible(true);
-        
+
         sendEmailTable.getTableHeader().setOpaque(false);
         sendEmailTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
         Font f = new Font("Calibri", Font.ITALIC, 18);
         JTableHeader header = sendEmailTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
 
     }//GEN-LAST:event_emailPageMouseClicked
 
@@ -4469,39 +4380,29 @@ public class LibraryFrame extends ColumnSize {
     private void employeePageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_employeePageMouseClicked
         bar(employeePageHover);
         frame = null;
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        mainPageContentOnLay.setVisible(false);
+        contentVisible();
         employeePageContentOnLay.setVisible(true);
-        
+
         employeeTable.getTableHeader().setOpaque(false);
         employeeTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
         Font f = new Font("Calibri", Font.ITALIC, 18);
         JTableHeader header = employeeTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
-        
+
         employeeTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = employeeTable.rowAtPoint(e.getPoint());
                 int col = employeeTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = employeeTable.getSelectedRow();
                 Long selectedRow = (Long) employeeTable.getValueAt(rowIndex, 0);
                 if (col == EmployeeEnum.VIEW.getValue() && frame == null) {
-                    
+
                     ViewEmployee viewEmployee = new ViewEmployee(dao, selectedRow);
                     viewEmployee.setVisible(true);
                     frame = viewEmployee;
@@ -4511,14 +4412,14 @@ public class LibraryFrame extends ColumnSize {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EmployeeEnum.EDIT.getValue() && frame == null) {
-                    
+
                     EditEmployee editEmployee = new EditEmployee(dao, selectedRow);
                     editEmployee.setVisible(true);
                     frame = editEmployee;
-                    
+
                     editEmployee.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
@@ -4531,13 +4432,13 @@ public class LibraryFrame extends ColumnSize {
                             }
                         }
                     });
-                    
+
                 }
                 if (col == EmployeeEnum.DELETE.getValue()) {
                     JLabel label = new JLabel("İşçini silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "İşçini Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deleteAuthor(selectedRow);
@@ -4551,7 +4452,7 @@ public class LibraryFrame extends ColumnSize {
                         }
                     }
                 }
-                
+
             }
         }
         );
@@ -4567,19 +4468,8 @@ public class LibraryFrame extends ColumnSize {
     }//GEN-LAST:event_employeePageMouseExited
 
     private void studentsMoreInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studentsMoreInfoMouseClicked
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        mainPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        
+        contentVisible();
+
         bar(studentPageHover);
         studentsPageContentOnLay.setVisible(true);
         studentsTable.getTableHeader().setOpaque(false);
@@ -4588,25 +4478,14 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = studentsTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
     }//GEN-LAST:event_studentsMoreInfoMouseClicked
 
     private void bookMoreInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bookMoreInfoMouseClicked
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        employeePageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        mainPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        
+        contentVisible();
+
         bar(bookPageHover);
         bookPageContentOnLay.setVisible(true);
         bookTable.getTableHeader().setOpaque(false);
@@ -4615,25 +4494,14 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = bookTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
     }//GEN-LAST:event_bookMoreInfoMouseClicked
 
     private void employeeMoreInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_employeeMoreInfoMouseClicked
-        tablePageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        authorPageContentOnLay.setVisible(false);
-        menuPageContentOnLay.setVisible(false);
-        orderPageContentOnLay.setVisible(false);
-        bookAdvancedSearchPageContentOnLay.setVisible(false);
-        calcPageContentOnLay.setVisible(false);
-        mainPageContentOnLay.setVisible(false);
-        orderBookPageContentOnLay.setVisible(false);
-        emailPageContentOnLay.setVisible(false);
-        studentsPageContentOnLay.setVisible(false);
-        bookPageContentOnLay.setVisible(false);
-        
+        contentVisible();
+
         bar(employeePageHover);
         employeePageContentOnLay.setVisible(true);
         employeeTable.getTableHeader().setOpaque(false);
@@ -4642,7 +4510,7 @@ public class LibraryFrame extends ColumnSize {
         JTableHeader header = employeeTable.getTableHeader();
         header.setFont(f);
         header.setForeground(Color.white);
-        
+
         ((DefaultTableCellRenderer) header.getDefaultRenderer())
                 .setHorizontalAlignment(JLabel.CENTER);
     }//GEN-LAST:event_employeeMoreInfoMouseClicked
@@ -4691,7 +4559,7 @@ public class LibraryFrame extends ColumnSize {
             frame = null;
             List<Student> studentList = dao.getStudentList();
             ViewStudentListInTable(studentList);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -4743,7 +4611,7 @@ public class LibraryFrame extends ColumnSize {
             frame = null;
             List<Product> productList = dao.getProductList();
             ViewProductListInTable(productList);
-            
+
             List<Paid> paidList = dao.getPaidList();
             ViewPaidListInTable(paidList);
         } catch (Exception ex) {
@@ -4761,37 +4629,37 @@ public class LibraryFrame extends ColumnSize {
             bookPageContentOnLay.setVisible(false);
             bookAdvancedSearchPageContentOnLay.setVisible(false);
             orderBookPageContentOnLay.setVisible(true);
-            
+
             soldBookTable.getTableHeader().setOpaque(false);
             soldBookTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
             Font f = new Font("Calibri", Font.ITALIC, 18);
             JTableHeader header = soldBookTable.getTableHeader();
             header.setFont(f);
             header.setForeground(Color.white);
-            
+
             ((DefaultTableCellRenderer) header.getDefaultRenderer())
                     .setHorizontalAlignment(JLabel.CENTER);
-            
+
             borrowBookTable.getTableHeader().setOpaque(false);
             borrowBookTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
             Font f1 = new Font("Calibri", Font.ITALIC, 18);
             JTableHeader header1 = borrowBookTable.getTableHeader();
             header1.setFont(f1);
             header1.setForeground(Color.white);
-            
+
             ((DefaultTableCellRenderer) header1.getDefaultRenderer())
                     .setHorizontalAlignment(JLabel.CENTER);
-            
+
             readNowBookTable.getTableHeader().setOpaque(false);
             readNowBookTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
             Font f2 = new Font("Calibri", Font.ITALIC, 18);
             JTableHeader header2 = readNowBookTable.getTableHeader();
             header2.setFont(f2);
             header2.setForeground(Color.white);
-            
+
             ((DefaultTableCellRenderer) header2.getDefaultRenderer())
                     .setHorizontalAlignment(JLabel.CENTER);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -4820,7 +4688,7 @@ public class LibraryFrame extends ColumnSize {
                 bookAdvancedSearchPageContentOnLay.setVisible(false);
                 soldBookPageContentOnLay.setVisible(false);
                 borrowBookPageContentOnLay.setVisible(true);
-                
+
                 globCheckName = "borrow";
                 List<OrderBook> orderBookList = dao.getOrderBookList((long) 2);
                 ViewBorrowBookListInTable(orderBookList, globCheckName);
@@ -4862,7 +4730,7 @@ public class LibraryFrame extends ColumnSize {
                 bookAdvancedSearchPageContentOnLay.setVisible(false);
                 soldBookPageContentOnLay.setVisible(false);
                 borrowBookPageContentOnLay.setVisible(true);
-                
+
                 globCheckName = BookType.BORROW.getValue();
                 List<OrderBook> orderBookList = dao.getOrderBookList((long) 2);
                 ViewBorrowBookListInTable(orderBookList, globCheckName);
@@ -4875,9 +4743,9 @@ public class LibraryFrame extends ColumnSize {
                 globCheckName = BookType.READNOW.getValue();
                 List<OrderBook> orderBookList = dao.getOrderBookList((long) 4);
                 ViewReadNowBookListInTable(orderBookList, globCheckName);
-                
+
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -5121,7 +4989,7 @@ public class LibraryFrame extends ColumnSize {
                         Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
                 @Override
                 public void windowClosing(WindowEvent e) {
                     try {
@@ -5131,9 +4999,9 @@ public class LibraryFrame extends ColumnSize {
                         Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
             });
-            
+
         }
 
     }//GEN-LAST:event_addOrderBookMouseClicked
@@ -5208,7 +5076,7 @@ public class LibraryFrame extends ColumnSize {
         try {
             List<TableOrder> searchTableOrder = dao.searchTableOrder(searchForOrder.getText());
             ViewTableOrderListInTable(searchTableOrder);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -5271,7 +5139,7 @@ public class LibraryFrame extends ColumnSize {
                 readNowBookPageContentOnLay.setVisible(false);
                 soldBookPageContentOnLay.setVisible(false);
                 borrowBookPageContentOnLay.setVisible(true);
-                
+
                 globCheckName = BookType.BORROW.getValue();
                 List<OrderBook> orderBookList = dao.searchOrderBook(searchBook.getText(), (long) 2);
                 ViewBorrowBookListInTable(orderBookList, globCheckName);
@@ -5283,9 +5151,9 @@ public class LibraryFrame extends ColumnSize {
                 globCheckName = BookType.READNOW.getValue();
                 List<OrderBook> orderBookList = dao.searchOrderBook(searchBook.getText(), (long) 4);
                 ViewReadNowBookListInTable(orderBookList, globCheckName);
-                
+
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -5312,26 +5180,26 @@ public class LibraryFrame extends ColumnSize {
             studentsPageContentOnLay.setVisible(false);
             bookPageContentOnLay.setVisible(false);
             bookAdvancedSearchPageContentOnLay.setVisible(true);
-            
+
             advancedBookTable.getTableHeader().setOpaque(false);
             advancedBookTable.getTableHeader().setBackground(Color.decode("#3E68FF"));
             Font f = new Font("Calibri", Font.ITALIC, 18);
             JTableHeader header = advancedBookTable.getTableHeader();
             header.setFont(f);
             header.setForeground(Color.white);
-            
+
             ((DefaultTableCellRenderer) header.getDefaultRenderer())
                     .setHorizontalAlignment(JLabel.CENTER);
             frame = null;
-            
+
             ViewBookTipListInComboBox();
-            
+
             advancedBookTable.addMouseListener(new java.awt.event.MouseAdapter() {
-                
+
                 public void mouseClicked(java.awt.event.MouseEvent e) {
                     int row = advancedBookTable.rowAtPoint(e.getPoint());
                     int col = advancedBookTable.columnAtPoint(e.getPoint());
-                    
+
                     int rowIndex = advancedBookTable.getSelectedRow();
                     Long selectedRow = (Long) advancedBookTable.getValueAt(rowIndex, 0);
                     if (col == 9) {
@@ -5346,14 +5214,14 @@ public class LibraryFrame extends ColumnSize {
                                 }
                             });
                         }
-                        
+
                     }
                     if (col == 10) {
                         if (frame == null) {
                             EditBook editBook = new EditBook(dao, selectedRow);
                             editBook.setVisible(true);
                             frame = editBook;
-                            
+
                             editBook.addWindowListener(new WindowAdapter() {
                                 @Override
                                 public void windowClosed(WindowEvent e) {
@@ -5361,13 +5229,13 @@ public class LibraryFrame extends ColumnSize {
                                 }
                             });
                         }
-                        
+
                     }
                     if (col == 11) {
                         JLabel label = new JLabel("Kitabı silmək isdədiyinizə əminsiz?");
                         label.setFont(new Font("Arial", Font.BOLD, 18));
                         int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Kitabı Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                        
+
                         if (isDeleteMsg == JOptionPane.YES_OPTION) {
                             try {
                                 boolean isDelete = dao.deleteBook(selectedRow);
@@ -5389,7 +5257,7 @@ public class LibraryFrame extends ColumnSize {
                                     AddOrderBookFrame addOrderBookFrame = new AddOrderBookFrame(dao, selectedRow);
                                     addOrderBookFrame.setVisible(true);
                                     frame = addOrderBookFrame;
-                                    
+
                                     addOrderBookFrame.addWindowListener(new WindowAdapter() {
                                         @Override
                                         public void windowClosed(WindowEvent e) {
@@ -5411,11 +5279,11 @@ public class LibraryFrame extends ColumnSize {
                             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    
+
                 }
             }
             );
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -5423,18 +5291,18 @@ public class LibraryFrame extends ColumnSize {
 
     private void searchAdvancedBookMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchAdvancedBookMouseClicked
         try {
-            
+
             AdvancedSearch advancedSearch = new AdvancedSearch();
             Item tipItem = (Item) tipCombo.getSelectedItem();
             advancedSearch.setBookTipId(tipItem.getId());
-            
+
             advancedSearch.setMinCopies(minCopies.getText());
             advancedSearch.setMaxCopies(maxCopies.getText());
             advancedSearch.setMinPageNum(minPageNum.getText());
             advancedSearch.setMaxPageNum(maxPageNum.getText());
             advancedSearch.setMinPrice(Float.valueOf(minPrice.getText()));
             advancedSearch.setMaxPrice(Float.valueOf(maxPrice.getText()));
-            
+
             List<Book> bookList = dao.advancedSearchBook(advancedSearch);;
             ViewAdvancedBookListInTable(bookList);
         } catch (Exception ex) {
@@ -5448,32 +5316,32 @@ public class LibraryFrame extends ColumnSize {
             AdvancedSearch advancedSearch = new AdvancedSearch();
             advancedSearch.setMinNum(minNum.getText());
             advancedSearch.setMaxNum(maxNum.getText());
-            
+
             if (!beginMoney.getText().isEmpty()) {
                 advancedSearch.setMinPrice(Float.parseFloat(beginMoney.getText()));
             }
-            
+
             if (!endMoney.getText().isEmpty()) {
                 advancedSearch.setMaxPrice(Float.parseFloat(endMoney.getText()));
             }
-            
+
             List<Product> productList = dao.advancedSearchProduct(advancedSearch);
             ViewProductListInTable(productList);
-            
+
         } catch (Exception ex) {
             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_searchProductAdvMouseClicked
 
     private void paidBtnMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paidBtnMouseClicked
-        
+
         int rowIndex = orderTable.getSelectedRow();
         Long selectedRow = (Long) orderTable.getValueAt(rowIndex, 0);
         if (frame == null) {
             PaidFrame paidFrame = new PaidFrame(dao, selectedRow);
             paidFrame.setVisible(true);
             frame = paidFrame;
-            
+
             paidFrame.addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosed(WindowEvent e) {
@@ -5509,7 +5377,7 @@ public class LibraryFrame extends ColumnSize {
             AdvancedSearch advancedSearch = new AdvancedSearch();
             advancedSearch.setBeginDate(beginDate.getDate());
             advancedSearch.setEndDate(endDate.getDate());
-            
+
             List<Paid> paidList = dao.advancedSearchPaid(advancedSearch);
             ViewPaidListInTable(paidList);
             for (Paid paid : paidList) {
@@ -5524,7 +5392,7 @@ public class LibraryFrame extends ColumnSize {
     private void refreshEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_refreshEmailMouseClicked
         LibraryFrame libraryFrame = new LibraryFrame(dao);
     }//GEN-LAST:event_refreshEmailMouseClicked
-    
+
     public void bar(JLabel label) {
         mainPageHover.setOpaque(false);
         studentPageHover.setOpaque(false);
@@ -5538,7 +5406,7 @@ public class LibraryFrame extends ColumnSize {
         employeePageHover.setOpaque(false);
         label.setOpaque(true);
         menu.repaint();
-        
+
     }
 
 
@@ -5880,48 +5748,29 @@ public class LibraryFrame extends ColumnSize {
     // End of variables declaration//GEN-END:variables
 
     private void ViewAuthorListInTable(List<Author> authorList) {
-        JLabel view = new JLabel();
-        view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
-        JLabel update = new JLabel();
-        update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
-        JLabel delete = new JLabel();
-        delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+        JLabel view = iconRenderer.view();
+        JLabel update = iconRenderer.update();
+        JLabel delete = iconRenderer.delete();
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+                iconRenderer.tableCellRenderer(view, update, delete);
                 return (Component) value;
-                
             }
-            
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
         };
-        
-        table.addColumn("Id");
-        table.addColumn("№");
-        table.addColumn("Ad");
-        table.addColumn("Soyad");
-        table.addColumn("Doğum Tarixi");
-        table.addColumn("Ölüm Tarixi");
-        table.addColumn("Ətraflı");
-        table.addColumn("Düzəliş et");
-        table.addColumn("Sil");
-        
+
+        // set name to columns for author table 
+        columnName.authorColumns(table);
+
         for (Author author : authorList) {
             authorNumber.setText(author.getRowNum().toString());
             Object data[] = new Object[]{
@@ -5930,41 +5779,42 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         authorTable.setModel(table);
+
         authorTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         authorTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         authorTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) authorTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
 
-        //Hide id for AuthorTable
         hide.hideId(authorTable);
 
-        // Set column size for Author Table
         columnSize.authorTableColumnSize(authorTable);
-        
+
         authorTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
+    private ColumnName columnName;
+
     private void ViewStudentListInTable(List<Student> studentList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         JLabel email = new JLabel();
         email.setIcon(new ImageIcon("Envelope_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
@@ -5973,18 +5823,18 @@ public class LibraryFrame extends ColumnSize {
                 email.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 return (Component) value;
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -5996,7 +5846,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Mesaj Göndər");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Student student : studentList) {
             studentsNumber.setText(student.getRowNum().toString());
             Object data[] = new Object[]{
@@ -6005,38 +5855,38 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         studentsTable.setModel(table);
         studentsTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         studentsTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         studentsTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
         studentsTable.getColumn("Mesaj Göndər").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) studentsTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(studentsTable);
-        
+
         columnSize.studentsTableColumnSize(studentsTable);
-        
+
         studentsTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewEmployeeListInTable(List<Employee> employeeList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete
                 .setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
@@ -6044,18 +5894,18 @@ public class LibraryFrame extends ColumnSize {
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 return (Component) value;
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -6068,7 +5918,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Employee employee : employeeList) {
             employeeNumber.setText(employee.getRowNum().toString());
             Object data[] = new Object[]{
@@ -6077,38 +5927,38 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         employeeTable.setModel(table);
         employeeTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         employeeTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         employeeTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) employeeTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(employeeTable);
-        
+
         columnSize.employeeTableColumnSize(employeeTable);
-        
+
         employeeTable.getTableHeader().setReorderingAllowed(false);
     }
-    
+
     private void ViewBookListInTable(List<Book> bookList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         JLabel orderBook = new JLabel();
         orderBook.setIcon(new ImageIcon("Add Shopping Cart_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
@@ -6116,20 +5966,20 @@ public class LibraryFrame extends ColumnSize {
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 orderBook.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Kitab Adı");
@@ -6143,7 +5993,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
         table.addColumn("Sifariş et");
-        
+
         for (Book book : bookList) {
             Object data[] = new Object[]{
                 book.getId(), book.getRowNum(), book.getTitle(), book.getBookTip().getTipName(), book.getPageNum(),
@@ -6152,58 +6002,58 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         bookTable.setModel(table);
         bookTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         bookTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         bookTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
         bookTable.getColumn("Sifariş et").setCellRenderer(new LabelRenderer());
-        
+
         hide.hideId(bookTable);
-        
+
         columnSize.bookTableColumnSize(bookTable);
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) bookTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         bookTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewMenuListInTable(List<Menu> menuList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Yemək Adı");
@@ -6211,7 +6061,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Menu menu : menuList) {
             menuNum.setText(menu.getRowNum().toString());
             Object data[] = new Object[]{
@@ -6219,55 +6069,55 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         menuTable.setModel(table);
         menuTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         menuTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         menuTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) menuTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(menuTable);
-        
+
         menuTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewProductListInTable(List<Product> productList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Produkt Adı");
@@ -6277,55 +6127,55 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Product product : productList) {
             Object data[] = new Object[]{
                 product.getId(), product.getRowNum(), product.getProductName(), product.getNum(), product.getAmount(), product.getPrice(), view, update, delete
             };
             table.addRow(data);
         }
-        
+
         productTable.setModel(table);
         productTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         productTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         productTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) productTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(productTable);
-        
+
         productTable.getColumnModel().getColumn(1).setPreferredWidth(30);
-        
+
         productTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewSendEmailList(List<SendEmail> sendEmailList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Tələbə Adı");
@@ -6335,7 +6185,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("İşçi Adı");
         table.addColumn("İşçi Soyadı");
         table.addColumn("Ətraflı");
-        
+
         for (SendEmail sendEmail : sendEmailList) {
             Object data[] = new Object[]{
                 sendEmail.getId(), sendEmail.getRowNum(),
@@ -6344,55 +6194,55 @@ public class LibraryFrame extends ColumnSize {
                 sendEmail.getEmployee().getName(), sendEmail.getEmployee().getSurname(), view,};
             table.addRow(data);
         }
-        
+
         sendEmailTable.setModel(table);
         sendEmailTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) sendEmailTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(sendEmailTable);
-        
+
         columnSize.sendEmailTableColumnSize(sendEmailTable);
-        
+
         sendEmailTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewNoteListInTable(List<Note> noteList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Qeyd");
@@ -6401,64 +6251,64 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Note note : noteList) {
             Object data[] = new Object[]{
                 note.getId(), note.getRowNum(), note.getNoteText(), note.getBeginDate(), note.getEndDate(), view, update, delete
             };
             table.addRow(data);
         }
-        
+
         notesTable.setModel(table);
         notesTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         notesTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         notesTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) notesTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(notesTable);
-        
+
         notesTable.getColumnModel().getColumn(1).setPreferredWidth(30);
-        
+
         notesTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewTableOrderListInTable(List<TableOrder> tableOrderList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -6468,9 +6318,9 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (TableOrder tableOrder : tableOrderList) {
-            
+
             Object data[] = new Object[]{
                 tableOrder.getId(), tableOrder.getRowNum(), tableOrder.getResName(), tableOrder.getTable().getName(),
                 tableOrder.getOrder().gettOrder(), tableOrder.getOrder().getPrice(),
@@ -6478,54 +6328,54 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         orderTable.setModel(table);
         orderTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         orderTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         orderTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) orderTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         orderTable.getColumnModel().getColumn(1).setPreferredWidth(10);
-        
+
         hide.hideId(orderTable);
-        
+
         orderTable.getTableHeader().setReorderingAllowed(false);
-        
+
     }
-    
+
     private void ViewPaidListInTable(List<Paid> paidList) {
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                
+
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Masa");
@@ -6533,7 +6383,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ödəmə Tarixi");
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
-        
+
         for (Paid paid : paidList) {
             Object data[] = new Object[]{
                 paid.getId(), paid.getRowNum(), paid.getTableOrder().getTable().getName(),
@@ -6542,36 +6392,36 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         paidTable.setModel(table);
-        
+
         paidTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         paidTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) paidTable.getDefaultRenderer(Object.class);
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(paidTable);
-        
+
         paidTable.getColumnModel().getColumn(1).setPreferredWidth(10);
-        
+
         paidTable.getTableHeader().setReorderingAllowed(false);
-        
+
         paidTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = paidTable.rowAtPoint(e.getPoint());
                 int col = paidTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = paidTable.getSelectedRow();
                 Long selectedRow = (Long) paidTable.getValueAt(rowIndex, 0);
-                
+
                 if (col == 5) {
                     if (frame == null) {
                         EditPaid editPaid = new EditPaid(dao, selectedRow);
                         editPaid.setVisible(true);
                         frame = editPaid;
-                        
+
                         editPaid.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -6579,19 +6429,19 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == 6) {
                     JLabel label = new JLabel("Ödənişi  silmək isdədiyinizə əminsiz?");
                     label.setFont(new Font("Arial", Font.BOLD, 18));
                     int isDeleteMsg = JOptionPane.showConfirmDialog(null, label, "Ödənişi Sil", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    
+
                     if (isDeleteMsg == JOptionPane.YES_OPTION) {
                         try {
                             boolean isDelete = dao.deletePaid(selectedRow);
                             if (isDelete) {
                                 JOptionPane.showMessageDialog(null, "Ödəniş Silindi...");
-                                
+
                             } else {
                                 JOptionPane.showMessageDialog(null, "Silinmədi!!!");
                             }
@@ -6599,48 +6449,48 @@ public class LibraryFrame extends ColumnSize {
                             Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                    
+
                 }
             }
-            
+
         }
         );
-        
+
     }
-    
+
     private void ViewSoldBookListInTable(List<OrderBook> orderBookList, String globCheckName) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Give_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -6650,7 +6500,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Qaytar");
-        
+
         for (OrderBook soldBook : orderBookList) {
             Object data[] = new Object[]{
                 soldBook.getId(), soldBook.getRowNum(), soldBook.getStudent().getName(), soldBook.getStudent().getSurname(),
@@ -6659,30 +6509,30 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         soldBookTable.setModel(table);
         soldBookTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         soldBookTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         soldBookTable.getColumn("Qaytar").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) soldBookTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(soldBookTable);
-        
+
         soldBookTable.getTableHeader().setReorderingAllowed(false);
-        
+
         soldBookTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = soldBookTable.rowAtPoint(e.getPoint());
                 int col = soldBookTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = soldBookTable.getSelectedRow();
                 Long selectedRow = (Long) soldBookTable.getValueAt(rowIndex, 0);
                 if (col == EnumSixToEight.VIEW.getValue() && frame == null) {
-                    
+
                     ViewOrderBook viewOrderBook = new ViewOrderBook(dao, selectedRow, globCheckName);
                     viewOrderBook.setVisible(true);
                     frame = viewOrderBook;
@@ -6692,28 +6542,28 @@ public class LibraryFrame extends ColumnSize {
                             frame = null;
                         }
                     });
-                    
+
                 }
-                
+
                 if (col == EnumSixToEight.EDIT.getValue() && frame == null) {
-                    
+
                     EditOrderBook editOrderBook = new EditOrderBook(dao, selectedRow, globCheckName);
                     editOrderBook.setVisible(true);
                     frame = editOrderBook;
-                    
+
                     editOrderBook.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
                             frame = null;
                         }
                     });
-                    
+
                 }
                 if (col == EnumSixToEight.DELETE.getValue() && frame == null) {
                     GiveBackFrame backFrame = new GiveBackFrame(selectedRow, dao, globCheckName);
                     backFrame.setVisible(true);
                     frame = backFrame;
-                    
+
                     backFrame.addWindowListener(new WindowAdapter() {
                         @Override
                         public void windowClosed(WindowEvent e) {
@@ -6727,53 +6577,53 @@ public class LibraryFrame extends ColumnSize {
                             }
                         }
                     });
-                    
+
                 }
-                
+
             }
-            
+
         }
         );
-        
+
     }
-    
+
     private void ViewBorrowBookListInTable(List<OrderBook> orderBookList, String globCheckName) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Give_30px.png"));
-        
+
         JLabel email = new JLabel();
         email.setIcon(new ImageIcon("Envelope_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 email.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -6785,7 +6635,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Düzəliş et");
         table.addColumn("Mesaj");
         table.addColumn("Qaytar");
-        
+
         for (OrderBook borrowBook : orderBookList) {
             Object data[] = new Object[]{
                 borrowBook.getId(), borrowBook.getRowNum(), borrowBook.getStudent().getName(), borrowBook.getStudent().getSurname(),
@@ -6794,27 +6644,27 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         borrowBookTable.setModel(table);
         borrowBookTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         borrowBookTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         borrowBookTable.getColumn("Qaytar").setCellRenderer(new LabelRenderer());
         borrowBookTable.getColumn("Mesaj").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) borrowBookTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(borrowBookTable);
-        
+
         borrowBookTable.getTableHeader().setReorderingAllowed(false);
-        
+
         borrowBookTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = borrowBookTable.rowAtPoint(e.getPoint());
                 int col = borrowBookTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = borrowBookTable.getSelectedRow();
                 Long selectedRow = (Long) borrowBookTable.getValueAt(rowIndex, 0);
                 if (col == 7) {
@@ -6829,15 +6679,15 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
-                
+
                 if (col == 8) {
                     if (frame == null) {
                         EditOrderBook editOrderBook = new EditOrderBook(dao, selectedRow, globCheckName);
                         editOrderBook.setVisible(true);
                         frame = editOrderBook;
-                        
+
                         editOrderBook.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -6845,7 +6695,7 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == 9) {
                     if (frame == null) {
@@ -6865,7 +6715,7 @@ public class LibraryFrame extends ColumnSize {
                         GiveBackFrame backFrame = new GiveBackFrame(selectedRow, dao, globCheckName);
                         backFrame.setVisible(true);
                         frame = backFrame;
-                        
+
                         backFrame.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -6881,46 +6731,44 @@ public class LibraryFrame extends ColumnSize {
                         });
                     }
                 }
-                
+
             }
         }
         );
-        
+
     }
-    
+
     private void ViewReadNowBookListInTable(List<OrderBook> orderBookList, String globCheckName) {
-        JLabel view = new JLabel();
-        view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
-        JLabel update = new JLabel();
-        update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
-        JLabel delete = new JLabel();
-        delete.setIcon(new ImageIcon("Give_30px.png"));
-        
+
+        JLabel view = iconRenderer.view();
+
+        JLabel update = iconRenderer.update();
+
+        JLabel delete = iconRenderer.delete();
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
-                
+
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Ad");
@@ -6929,7 +6777,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Ətraflı");
         table.addColumn("Düzəliş et");
         table.addColumn("Qaytar");
-        
+
         for (OrderBook readNowBook : orderBookList) {
             Object data[] = new Object[]{
                 readNowBook.getId(), readNowBook.getRowNum(), readNowBook.getStudent().getName(), readNowBook.getStudent().getSurname(),
@@ -6938,26 +6786,26 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         readNowBookTable.setModel(table);
         readNowBookTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         readNowBookTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         readNowBookTable.getColumn("Qaytar").setCellRenderer(new LabelRenderer());
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) readNowBookTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         hide.hideId(readNowBookTable);
-        
+
         readNowBookTable.getTableHeader().setReorderingAllowed(false);
-        
+
         readNowBookTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            
+
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = readNowBookTable.rowAtPoint(e.getPoint());
                 int col = readNowBookTable.columnAtPoint(e.getPoint());
-                
+
                 int rowIndex = readNowBookTable.getSelectedRow();
                 Long selectedRow = (Long) readNowBookTable.getValueAt(rowIndex, 0);
                 if (col == 5) {
@@ -6972,15 +6820,15 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
-                
+
                 if (col == 6) {
                     if (frame == null) {
                         EditOrderBook editOrderBook = new EditOrderBook(dao, selectedRow, globCheckName);
                         editOrderBook.setVisible(true);
                         frame = editOrderBook;
-                        
+
                         editOrderBook.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -6988,14 +6836,14 @@ public class LibraryFrame extends ColumnSize {
                             }
                         });
                     }
-                    
+
                 }
                 if (col == 7) {
                     if (frame == null) {
                         GiveBackFrame backFrame = new GiveBackFrame(selectedRow, dao, globCheckName);
                         backFrame.setVisible(true);
                         frame = backFrame;
-                        
+
                         backFrame.addWindowListener(new WindowAdapter() {
                             @Override
                             public void windowClosed(WindowEvent e) {
@@ -7011,27 +6859,28 @@ public class LibraryFrame extends ColumnSize {
                         });
                     }
                 }
-                
+
             }
         }
         );
     }
-    
+    private IconRenderer iconRenderer;
+
     private void ViewAdvancedBookListInTable(List<Book> bookList) {
         JLabel view = new JLabel();
         view.setIcon(new ImageIcon("ViewB_30px.png"));
-        
+
         JLabel update = new JLabel();
         update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-        
+
         JLabel delete = new JLabel();
         delete.setIcon(new ImageIcon("Delete_30px.png"));
-        
+
         JLabel orderBook = new JLabel();
         orderBook.setIcon(new ImageIcon("Add Shopping Cart_30px.png"));
-        
+
         class LabelRenderer implements TableCellRenderer {
-            
+
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
@@ -7039,20 +6888,20 @@ public class LibraryFrame extends ColumnSize {
                 delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 orderBook.setHorizontalAlignment((int) CENTER_ALIGNMENT);
                 return (Component) value;
-                
+
             }
-            
+
         }
-        
+
         DefaultTableModel table = new DefaultTableModel() {
-            
+
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
-            
+
         };
-        
+
         table.addColumn("Id");
         table.addColumn("№");
         table.addColumn("Kitab Adı");
@@ -7066,7 +6915,7 @@ public class LibraryFrame extends ColumnSize {
         table.addColumn("Düzəliş et");
         table.addColumn("Sil");
         table.addColumn("Sifariş et");
-        
+
         for (Book book : bookList) {
             Object data[] = new Object[]{
                 book.getId(), book.getRowNum(), book.getTitle(), book.getBookTip().getTipName(), book.getPageNum(),
@@ -7075,24 +6924,24 @@ public class LibraryFrame extends ColumnSize {
             };
             table.addRow(data);
         }
-        
+
         advancedBookTable.setModel(table);
         advancedBookTable.getColumn("Ətraflı").setCellRenderer(new LabelRenderer());
         advancedBookTable.getColumn("Düzəliş et").setCellRenderer(new LabelRenderer());
         advancedBookTable.getColumn("Sil").setCellRenderer(new LabelRenderer());
         advancedBookTable.getColumn("Sifariş et").setCellRenderer(new LabelRenderer());
-        
+
         hide.hideId(advancedBookTable);
-        
+
         columnSize.advancedBookTableColumnSize(advancedBookTable);
-        
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) advancedBookTable.getDefaultRenderer(Object.class
         );
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
-        
+
         advancedBookTable.getTableHeader().setReorderingAllowed(false);
     }
-    
+
     private void ViewBookTipListInComboBox() {
         try {
             DefaultComboBoxModel model = (DefaultComboBoxModel) tipCombo.getModel();
@@ -7104,8 +6953,8 @@ public class LibraryFrame extends ColumnSize {
             Logger.getLogger(LibraryFrame.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
 }
 // 7168
