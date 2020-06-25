@@ -16,7 +16,6 @@ import javax.swing.JLabel;
 public class IconRenderer {
 
     public IconRenderer() {
-
     }
 
     public JLabel view() {
@@ -37,10 +36,23 @@ public class IconRenderer {
         return delete;
     }
 
+    public JLabel shoppingCartIcon() {
+        JLabel orderBook = new JLabel();
+        orderBook.setIcon(new ImageIcon("Add Shopping Cart_30px.png"));
+        return orderBook;
+    }
+
     public void tableCellRenderer(JLabel view, JLabel update, JLabel delete) {
         view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
         update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
         delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+    }
+
+    public void bookTableCellRenderer(JLabel view, JLabel update, JLabel delete, JLabel orderBook) {
+        view.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+        update.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+        delete.setHorizontalAlignment((int) CENTER_ALIGNMENT);
+        orderBook.setHorizontalAlignment((int) CENTER_ALIGNMENT);
     }
 
 }

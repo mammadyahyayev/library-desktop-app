@@ -3763,46 +3763,40 @@ public class LibraryFrame extends ColumnSize {
 
                 int rowIndex = studentsTable.getSelectedRow();
                 Long selectedRow = (Long) studentsTable.getValueAt(rowIndex, 0);
-                if (col == StudentEnum.VIEW.getValue()) {
-                    if (frame == null) {
-                        ViewStudent viewStudent = new ViewStudent(dao, selectedRow);
-                        viewStudent.setVisible(true);
-                        frame = viewStudent;
-                        viewStudent.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                frame = null;
-                            }
-                        });
-                    }
+                if (col == StudentEnum.VIEW.getValue() && frame == null) {
+                    ViewStudent viewStudent = new ViewStudent(dao, selectedRow);
+                    viewStudent.setVisible(true);
+                    frame = viewStudent;
+                    viewStudent.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            frame = null;
+                        }
+                    });
 
                 }
-                if (col == StudentEnum.SEND_MESSAGE.getValue()) {
-                    if (frame == null) {
-                        NewMessage message = new NewMessage(dao, selectedRow);
-                        message.setVisible(true);
-                        frame = message;
-                        message.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                frame = null;
-                            }
-                        });
-                    }
+                if (col == StudentEnum.SEND_MESSAGE.getValue() && frame == null) {
+                    NewMessage message = new NewMessage(dao, selectedRow);
+                    message.setVisible(true);
+                    frame = message;
+                    message.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            frame = null;
+                        }
+                    });
 
                 }
-                if (col == StudentEnum.EDIT.getValue()) {
-                    if (frame == null) {
-                        EditStudent editStudent = new EditStudent(dao, selectedRow);
-                        editStudent.setVisible(true);
-                        frame = editStudent;
-                        editStudent.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                frame = null;
-                            }
-                        });
-                    }
+                if (col == StudentEnum.EDIT.getValue() && frame == null) {
+                    EditStudent editStudent = new EditStudent(dao, selectedRow);
+                    editStudent.setVisible(true);
+                    frame = editStudent;
+                    editStudent.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            frame = null;
+                        }
+                    });
 
                 }
                 if (col == StudentEnum.DELETE.getValue()) {
@@ -3854,33 +3848,29 @@ public class LibraryFrame extends ColumnSize {
 
                 int rowIndex = bookTable.getSelectedRow();
                 Long selectedRow = (Long) bookTable.getValueAt(rowIndex, 0);
-                if (col == BookEnum.VIEW.getValue()) {
-                    if (frame == null) {
-                        ViewBook viewBook = new ViewBook(dao, selectedRow);
-                        viewBook.setVisible(true);
-                        frame = viewBook;
-                        viewBook.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                frame = null;
-                            }
-                        });
-                    }
+                if (col == BookEnum.VIEW.getValue() && frame == null) {
+                    ViewBook viewBook = new ViewBook(dao, selectedRow);
+                    viewBook.setVisible(true);
+                    frame = viewBook;
+                    viewBook.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            frame = null;
+                        }
+                    });
 
                 }
-                if (col == BookEnum.EDIT.getValue()) {
-                    if (frame == null) {
-                        EditBook editBook = new EditBook(dao, selectedRow);
-                        editBook.setVisible(true);
-                        frame = editBook;
+                if (col == BookEnum.EDIT.getValue() && frame == null) {
+                    EditBook editBook = new EditBook(dao, selectedRow);
+                    editBook.setVisible(true);
+                    frame = editBook;
 
-                        editBook.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                frame = null;
-                            }
-                        });
-                    }
+                    editBook.addWindowListener(new WindowAdapter() {
+                        @Override
+                        public void windowClosed(WindowEvent e) {
+                            frame = null;
+                        }
+                    });
 
                 }
                 if (col == BookEnum.DELETE.getValue()) {
@@ -3904,26 +3894,25 @@ public class LibraryFrame extends ColumnSize {
                 if (col == BookEnum.ORDER_BOOK.getValue()) {
                     try {
                         Book book = dao.getBookById(selectedRow);
-                        if (book.getCopies() != 0) {
-                            if (frame == null) {
-                                AddOrderBookFrame addOrderBookFrame = new AddOrderBookFrame(dao, selectedRow);
-                                addOrderBookFrame.setVisible(true);
-                                frame = addOrderBookFrame;
+                        if (book.getCopies() != 0 && frame == null) {
+                            AddOrderBookFrame addOrderBookFrame = new AddOrderBookFrame(dao, selectedRow);
+                            addOrderBookFrame.setVisible(true);
+                            frame = addOrderBookFrame;
 
-                                addOrderBookFrame.addWindowListener(new WindowAdapter() {
-                                    @Override
-                                    public void windowClosed(WindowEvent e) {
-                                        try {
-                                            frame = null;
-                                            List<Book> bookList = dao.getBookList();
-                                            ViewBookListInTable(bookList);
-                                            refreshBookMouseClicked(evt);
-                                        } catch (Exception ex) {
-                                            Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
+                            addOrderBookFrame.addWindowListener(new WindowAdapter() {
+                                @Override
+                                public void windowClosed(WindowEvent e) {
+                                    try {
+                                        frame = null;
+                                        List<Book> bookList = dao.getBookList();
+                                        ViewBookListInTable(bookList);
+                                        refreshBookMouseClicked(evt);
+                                    } catch (Exception ex) {
+                                        Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                                     }
-                                });
-                            }
+                                }
+                            });
+
                         } else {
                             JOptionPane.showMessageDialog(null, "Hal hazırda əlimizdə bu kitabdan yoxdur");
                         }
@@ -5746,6 +5735,7 @@ public class LibraryFrame extends ColumnSize {
     private javax.swing.JPanel warningBoardHeader;
     private javax.swing.JTable warningTable;
     // End of variables declaration//GEN-END:variables
+    
 
     private void ViewAuthorListInTable(List<Author> authorList) {
         JLabel view = iconRenderer.view();
@@ -6867,17 +6857,10 @@ public class LibraryFrame extends ColumnSize {
     private IconRenderer iconRenderer;
 
     private void ViewAdvancedBookListInTable(List<Book> bookList) {
-        JLabel view = new JLabel();
-        view.setIcon(new ImageIcon("ViewB_30px.png"));
-
-        JLabel update = new JLabel();
-        update.setIcon(new ImageIcon("UpdateA File_30px.png"));
-
-        JLabel delete = new JLabel();
-        delete.setIcon(new ImageIcon("Delete_30px.png"));
-
-        JLabel orderBook = new JLabel();
-        orderBook.setIcon(new ImageIcon("Add Shopping Cart_30px.png"));
+        JLabel view = iconRenderer.view();
+        JLabel update = iconRenderer.update();
+        JLabel delete = iconRenderer.delete();
+        JLabel orderBook = iconRenderer.shoppingCartIcon();
 
         class LabelRenderer implements TableCellRenderer {
 
