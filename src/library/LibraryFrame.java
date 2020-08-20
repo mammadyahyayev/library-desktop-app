@@ -5228,11 +5228,11 @@ public class LibraryFrame extends ColumnSize {
                         if (isDeleteMsg == JOptionPane.YES_OPTION) {
                             try {
                                 boolean isDelete = dao.deleteBook(selectedRow);
-                                if (isDelete) {
+                                if (isDelete) 
                                     JOptionPane.showMessageDialog(null, "Kitab Silindi...");
-                                } else {
+                                 else 
                                     JOptionPane.showMessageDialog(null, "Silinmədi!!!");
-                                }
+                                
                             } catch (Exception ex) {
                                 Logger.getLogger(LibraryFrame.class.getName()).log(Level.SEVERE, null, ex);
                             }
